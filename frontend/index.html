@@ -1605,7 +1605,7 @@ function t(key, replacements){
 /* =====================================================
    CONFIG — Backend API URL
 ===================================================== */
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://shop-backend-x00h.onrender.com/api';
 
 /* =====================================================
    HELPERS
@@ -1908,7 +1908,7 @@ function productCardHTML(p){
   const cat = CATEGORIES[p.category] || CATEGORIES.electronics;
   return `<div class="product-card" onclick="openDetail(${p.id})">
     <div class="card-swatch" style="background:${cat.color}">
-      ${p.photo ? `<img src="http://localhost:5000${p.photo}" alt="${escapeHtml(p.name)}">` : icon(cat.icon)}
+      ${p.photo ? `<img src="https://shop-backend-x00h.onrender.com${p.photo}" alt="${escapeHtml(p.name)}">` : icon(cat.icon)}
       <span class="cat-chip">${cat.label}</span>
     </div>
     <div class="card-body">
@@ -1994,7 +1994,7 @@ async function openDetail(id){
     document.getElementById('detail-content').innerHTML = `
       <div class="detail-card">
         <div class="detail-swatch" style="background:${cat.color}">
-          ${p.photo ? `<img src="http://localhost:5000${p.photo}" alt="${escapeHtml(p.name)}">` : icon(cat.icon)}
+          ${p.photo ? `<img src="https://shop-backend-x00h.onrender.com${p.photo}" alt="${escapeHtml(p.name)}">` : icon(cat.icon)}
         </div>
         <div class="detail-body">
           <p class="detail-name">${escapeHtml(p.name)}</p>
@@ -2183,7 +2183,7 @@ function cartItemHTML(c){
   const cat = CATEGORIES[c.category] || CATEGORIES.electronics;
   return `<div class="cart-item">
     <div class="swatch" style="background:${cat.color}">
-      ${c.photo ? `<img src="http://localhost:5000${c.photo}" alt="${escapeHtml(c.name)}">` : icon(cat.icon)}
+      ${c.photo ? `<img src="https://shop-backend-x00h.onrender.com${c.photo}" alt="${escapeHtml(c.name)}">` : icon(cat.icon)}
     </div>
     <div class="cart-item-body">
       <div class="cart-item-top">
@@ -2482,7 +2482,7 @@ function sellerCardHTML(p){
   const statusText = p.sold ? t('unavailable') : (p.quantity>0 ? p.quantity+' '+t('in_stock') : t('out_of_stock'));
   return `<div class="product-card">
     <div class="card-swatch" style="background:${cat.color}">
-      ${p.photo ? `<img src="http://localhost:5000${p.photo}" alt="${escapeHtml(p.name)}">` : icon(cat.icon)}
+      ${p.photo ? `<img src="https://shop-backend-x00h.onrender.com${p.photo}" alt="${escapeHtml(p.name)}">` : icon(cat.icon)}
       ${p.sold ? `<div class="sold-overlay"><span>${t('mark_sold')}</span></div>` : ''}
     </div>
     <div class="card-body">
