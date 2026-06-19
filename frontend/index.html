@@ -11,7 +11,874 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-  /* ... (keep all your existing CSS here, it's huge so I'm not retyping it) ... */
+  :root{
+    --pine:#1F3A30;
+    --saffron:#D98E3F;
+    --saffron-dark:#C17A2E;
+    --bg:#F4F7F4;
+    --surface:#FFFFFF;
+    --ink:#1C2420;
+    --muted:#6B7770;
+    --line:#E3E8E2;
+    --danger:#C1503F;
+    --danger-dark:#A8402F;
+    --font-display:'Fraunces',Georgia,serif;
+    --font-body:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;min-height:100%;}
+  body{
+    font-family:var(--font-body);
+    color:var(--ink);
+    background:#ECEFE9;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  button,input,select,textarea{font-family:inherit;color:inherit;}
+  img{display:block;max-width:100%;}
+  h1,h2,h3,p{margin:0;}
+  a{cursor:pointer;}
+
+  .icon{width:20px;height:20px;flex-shrink:0;display:block;}
+
+  /* ---------- App shell ---------- */
+  .app-shell{
+    max-width:480px;
+    margin:0 auto;
+    min-height:100vh;
+    background:var(--bg);
+    position:relative;
+    box-shadow:0 0 0 1px var(--line), 0 18px 60px rgba(20,26,22,.06);
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    position:sticky;
+    top:0;
+    z-index:100;
+    background:var(--pine);
+    color:#fff;
+    padding-bottom:14px;
+  }
+  .brand-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:18px 18px 10px;
+  }
+  .brand-mark{
+    width:36px;height:36px;
+    border-radius:50%;
+    background:rgba(255,255,255,.14);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .brand-mark svg{width:18px;height:18px;color:#fff;}
+  .brand-name{
+    font-family:var(--font-display);
+    font-style:italic;
+    font-weight:600;
+    font-size:23px;
+    letter-spacing:-.01em;
+    color:#fff;
+    line-height:1.1;
+  }
+  .brand-name .accent{color:var(--saffron);font-style:normal;}
+  .brand-tag{
+    font:600 10px var(--font-body);
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:rgba(255,255,255,.62);
+    margin-top:2px;
+  }
+
+  .search-row{
+    display:flex;
+    gap:8px;
+    padding:0 16px;
+    align-items:center;
+  }
+  .search-row.hidden{
+    display:none;
+  }
+  .search-input{
+    flex:1;
+    background:#fff;
+    border:none;
+    border-radius:999px;
+    padding:11px 16px;
+    font:14px var(--font-body);
+    color:var(--ink);
+    outline:none;
+  }
+  .search-input::placeholder{color:var(--muted);}
+  .search-btn{
+    width:44px;height:44px;
+    flex-shrink:0;
+    border:none;
+    border-radius:999px;
+    background:var(--saffron);
+    color:var(--ink);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+  }
+  .search-btn:hover{background:var(--saffron-dark);}
+  .search-btn svg{width:18px;height:18px;}
+
+  .filter-btn{
+    width:44px;height:44px;
+    flex-shrink:0;
+    border:none;
+    border-radius:999px;
+    background:rgba(255,255,255,.15);
+    color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    transition:background .15s;
+  }
+  .filter-btn:hover{background:rgba(255,255,255,.25);}
+  .filter-btn svg{width:18px;height:18px;}
+
+  /* ---------- Pages ---------- */
+  main{padding:18px 16px 100px;}
+  .page{display:none;}
+  .page.active{display:block;animation:fadeIn .18s ease;}
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+  .section-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin:4px 0 14px;
+  }
+  .section-title{
+    font:600 16px var(--font-display);
+    color:var(--ink);
+  }
+  .count-chip{
+    background:var(--line);
+    color:var(--muted);
+    font:600 11px var(--font-body);
+    padding:3px 9px;
+    border-radius:999px;
+  }
+
+  /* ---------- Product grid + cards ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+  }
+  .product-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    cursor:pointer;
+    transition:transform .12s, box-shadow .12s;
+  }
+  .product-card:active{transform:scale(.97);}
+  .product-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.06);}
+  .card-swatch{
+    position:relative;
+    aspect-ratio:1/1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#2F4F46;
+    overflow:hidden;
+  }
+  .card-swatch svg{width:32%;height:32%;color:#fff;opacity:.9;}
+  .card-swatch img{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    background:#f0f0f0;
+  }
+  .cat-chip{
+    position:absolute;
+    top:8px;left:8px;
+    background:rgba(255,255,255,.2);
+    color:#fff;
+    font:600 9.5px var(--font-body);
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    padding:3px 7px;
+    border-radius:999px;
+    z-index:2;
+  }
+  .sold-overlay{
+    position:absolute;inset:0;
+    background:rgba(20,26,22,.58);
+    display:flex;align-items:center;justify-content:center;
+    z-index:3;
+  }
+  .sold-overlay span{
+    color:#fff;
+    font:700 11px var(--font-body);
+    text-transform:uppercase;
+    letter-spacing:.05em;
+  }
+  .card-body{
+    padding:10px 11px 12px;
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+    flex:1;
+  }
+  .card-name{
+    font:600 13px/1.3 var(--font-body);
+    color:var(--ink);
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+    min-height:34px;
+  }
+  .stock-caption{font:11.5px var(--font-body);color:var(--muted);}
+  .card-footer{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:auto;
+    gap:8px;
+  }
+  .price-tag{
+    display:inline-flex;
+    align-items:center;
+    position:relative;
+    background:var(--pine);
+    color:#fff;
+    font:600 12.5px var(--font-body);
+    font-variant-numeric:tabular-nums;
+    padding:5px 9px 5px 14px;
+    border-radius:2px 7px 7px 2px;
+    white-space:nowrap;
+  }
+  .price-tag::before{
+    content:'';
+    position:absolute;
+    left:4px;top:50%;
+    width:5px;height:5px;
+    border-radius:50%;
+    background:#fff;
+    opacity:.88;
+    transform:translateY(-50%);
+  }
+  .add-fab{
+    width:30px;height:30px;
+    flex-shrink:0;
+    border:none;
+    border-radius:50%;
+    background:var(--saffron);
+    color:var(--ink);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+  }
+  .add-fab:hover{background:var(--saffron-dark);}
+  .add-fab svg{width:16px;height:16px;}
+
+  .seller-actions{
+    display:flex;
+    gap:6px;
+    margin-top:2px;
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    font:600 13.5px var(--font-body);
+    padding:11px 14px;
+    border-radius:10px;
+    border:1px solid transparent;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    transition:transform .12s,background .15s,opacity .15s;
+    white-space:nowrap;
+  }
+  .btn svg{width:15px;height:15px;}
+  .btn:active{transform:scale(.97);}
+  .btn-fill{background:var(--saffron);color:var(--ink);}
+  .btn-fill:hover{background:var(--saffron-dark);}
+  .btn-fill-pine{background:var(--pine);color:#fff;}
+  .btn-fill-pine:hover{background:#162e25;}
+  .btn-outline{background:transparent;border-color:var(--pine);color:var(--pine);}
+  .btn-outline:hover{background:rgba(31,58,48,.06);}
+  .btn-outline-danger{background:transparent;border-color:var(--danger);color:var(--danger);}
+  .btn-outline-danger:hover{background:rgba(193,80,63,.07);}
+  .btn-block{width:100%;}
+  .btn-sm{padding:8px 10px;font-size:12px;border-radius:8px;}
+  .icon-btn{
+    background:none;border:none;color:var(--muted);
+    padding:6px;border-radius:8px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .icon-btn:hover{color:var(--danger);background:rgba(193,80,63,.08);}
+  .icon-btn svg{width:17px;height:17px;}
+
+  .field-error input,.field-error select,.field-error textarea{border-color:var(--danger) !important;}
+
+  /* ---------- Forms ---------- */
+  .form-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:18px;
+  }
+  .field{margin-bottom:14px;}
+  .field label{
+    display:block;
+    font:600 11px var(--font-body);
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+  .field input,.field select,.field textarea{
+    width:100%;
+    padding:11px 13px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    font:14px var(--font-body);
+    color:var(--ink);
+    background:#fff;
+    outline:none;
+  }
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--pine);}
+  .field textarea{resize:vertical;min-height:74px;}
+  .field-row{display:flex;gap:10px;}
+  .field-row .field{flex:1;}
+
+  .photo-picker{
+    width:100%;
+    aspect-ratio:1/1;
+    max-height:160px;
+    border:1.6px dashed var(--line);
+    border-radius:14px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    color:var(--muted);
+    cursor:pointer;
+    background:#fafbfa;
+    overflow:hidden;
+    position:relative;
+    margin-bottom:14px;
+  }
+  .photo-picker img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .photo-picker .ph-icon svg{width:24px;height:24px;}
+  .photo-picker .ph-hint{font:12px var(--font-body);font-weight:500;}
+  .avatar-picker{
+    width:92px;height:92px;
+    max-height:none;
+    border-radius:50%;
+    margin:0 auto 16px;
+  }
+
+  /* ---------- Empty / gate states ---------- */
+  .empty-state{
+    text-align:center;
+    padding:54px 22px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+  }
+  .empty-icon{
+    width:58px;height:58px;
+    border-radius:50%;
+    background:var(--line);
+    color:var(--muted);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .empty-icon svg{width:25px;height:25px;}
+  .empty-title{font:600 16px var(--font-display);color:var(--ink);}
+  .empty-copy{font:13px/1.5 var(--font-body);color:var(--muted);max-width:240px;}
+
+  .gate-card{
+    margin-top:30px;
+    padding:34px 22px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:18px;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+  }
+  .gate-icon{
+    width:60px;height:60px;
+    border-radius:50%;
+    background:rgba(31,58,48,.08);
+    color:var(--pine);
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:4px;
+  }
+  .gate-icon svg{width:26px;height:26px;}
+  .gate-title{font:600 19px var(--font-display);color:var(--ink);}
+  .gate-copy{font:13.5px/1.5 var(--font-body);color:var(--muted);max-width:280px;}
+  .gate-actions{display:flex;gap:10px;width:100%;margin-top:14px;}
+
+  /* ---------- Cart ---------- */
+  .cart-item{
+    display:flex;
+    gap:12px;
+    padding:12px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:14px;
+    margin-bottom:10px;
+    align-items:center;
+  }
+  .cart-item .swatch{
+    width:52px;height:52px;
+    flex-shrink:0;
+    border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    overflow:hidden;
+    background:#2F4F46;
+  }
+  .cart-item .swatch img{width:100%;height:100%;object-fit:cover;}
+  .cart-item .swatch svg{width:22px;height:22px;color:#fff;}
+  .cart-item-body{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0;}
+  .cart-item-top{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;}
+  .cart-item-top .card-name{min-height:0;}
+  .cart-item-bottom{display:flex;justify-content:space-between;align-items:center;}
+  .qty-stepper{
+    display:inline-flex;
+    align-items:center;
+    border:1px solid var(--line);
+    border-radius:999px;
+    overflow:hidden;
+  }
+  .qty-stepper button{
+    width:26px;height:26px;
+    border:none;background:#fff;color:var(--ink);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+  }
+  .qty-stepper button:hover{background:var(--bg);}
+  .qty-stepper button svg{width:13px;height:13px;}
+  .qty-stepper span{min-width:24px;text-align:center;font:600 12.5px var(--font-body);font-variant-numeric:tabular-nums;}
+
+  .cart-summary{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-top:4px;
+  }
+  .summary-row{display:flex;justify-content:space-between;align-items:center;}
+  .summary-row span:first-child{font:13px var(--font-body);color:var(--muted);}
+  .summary-amount{font:700 18px var(--font-body);color:var(--ink);font-variant-numeric:tabular-nums;}
+
+  /* ---------- Store dashboard ---------- */
+  .dash-card{
+    position:relative;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:18px;
+  }
+  .dash-actions{
+    position:absolute;
+    top:16px;right:16px;
+    display:flex;
+    gap:8px;
+  }
+  .dash-actions button{
+    background:none;
+    border:none;
+    color:var(--muted);
+    font:600 11.5px var(--font-body);
+    cursor:pointer;
+    padding:4px 8px;
+    border-radius:6px;
+    display:flex;
+    align-items:center;
+    gap:4px;
+    transition:background .15s;
+  }
+  .dash-actions button:hover{background:rgba(0,0,0,.05);}
+  .dash-actions .logout-btn:hover{color:var(--danger);}
+  .dash-actions .settings-btn:hover{color:var(--pine);}
+  .dash-actions svg{width:14px;height:14px;}
+  .dash-profile{display:flex;gap:12px;align-items:center;padding-right:120px;}
+  .avatar{
+    width:56px;height:56px;
+    border-radius:50%;
+    background:var(--pine);
+    color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font:600 17px var(--font-display);
+    overflow:hidden;
+    flex-shrink:0;
+  }
+  .avatar img{width:100%;height:100%;object-fit:cover;}
+  .dash-name{font:600 17px var(--font-display);color:var(--ink);margin-bottom:3px;}
+  .dash-shop{font:13px var(--font-body);font-weight:500;color:var(--muted);display:flex;align-items:center;gap:5px;}
+  .dash-shop svg{width:13px;height:13px;}
+  .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;}
+  .stat-tile{
+    background:var(--bg);
+    border-radius:12px;
+    padding:12px 5px;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+  }
+  .stat-tile svg{width:17px;height:17px;color:var(--pine);}
+  .stat-num{font:700 14px var(--font-body);color:var(--ink);font-variant-numeric:tabular-nums;}
+  .stat-label{font:600 9.5px var(--font-body);color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+
+  .dash-payment-row {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px solid var(--line);
+  }
+  .dash-payment-label {
+    font:500 13px var(--font-body);
+    color:var(--muted);
+  }
+  .dash-payment-balance {
+    font:600 15px var(--font-body);
+    color:var(--pine);
+  }
+  .dash-payment-plus {
+    width:36px;
+    height:36px;
+    border:none;
+    border-radius:50%;
+    background:var(--pine);
+    color:#fff;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    font-size:20px;
+    font-weight:700;
+    line-height:1;
+    transition:transform .12s,background .15s;
+  }
+  .dash-payment-plus:hover{background:#162e25;transform:scale(1.05);}
+
+  /* ---------- Modal ---------- */
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(20,26,22,.5);
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:300;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-box{
+    width:100%;
+    max-width:480px;
+    background:var(--surface);
+    border-radius:18px 18px 0 0;
+    padding:20px 20px 28px;
+    max-height:88vh;
+    overflow-y:auto;
+    animation:slideUp .2s ease;
+  }
+  @keyframes slideUp{from{transform:translateY(16px);opacity:.6;}to{transform:translateY(0);opacity:1;}}
+  .sheet-handle{width:36px;height:4px;background:var(--line);border-radius:999px;margin:0 auto 16px;}
+  .modal-title{font:600 19px var(--font-display);color:var(--ink);margin-bottom:4px;}
+  .modal-sub{font:13px/1.4 var(--font-body);color:var(--muted);margin-bottom:16px;}
+  .modal-actions{display:flex;gap:10px;margin-top:4px;}
+  .modal-switch{margin-top:14px;text-align:center;font:13px var(--font-body);color:var(--muted);}
+  .modal-switch a{color:var(--pine);font-weight:600;}
+
+  /* Payment methods in modal */
+  .payment-method-item {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .payment-method-item:last-child{border-bottom:0;}
+  .pm-name {
+    font:500 14px var(--font-body);
+    color:var(--ink);
+  }
+  .pm-detail {
+    font:13px var(--font-body);
+    color:var(--muted);
+  }
+  .pm-remove {
+    background:none;
+    border:none;
+    color:var(--danger);
+    cursor:pointer;
+    font-size:13px;
+    font-weight:600;
+  }
+  .pm-remove:hover{text-decoration:underline;}
+
+  /* ---------- Language selector in settings ---------- */
+  .lang-option {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 14px;
+    border-bottom:1px solid var(--line);
+    cursor:pointer;
+    transition:background .15s;
+    border-radius:8px;
+  }
+  .lang-option:hover{background:var(--bg);}
+  .lang-option .lang-name{font:500 14px var(--font-body);color:var(--ink);}
+  .lang-option .lang-native{font:13px var(--font-body);color:var(--muted);}
+  .lang-option .lang-check{color:var(--pine);display:none;}
+  .lang-option.active .lang-check{display:block;}
+  .lang-option.active{background:rgba(31,58,48,.06);}
+
+  /* ---------- Toast ---------- */
+  .toast{
+    position:fixed;
+    left:50%;
+    bottom:88px;
+    transform:translate(-50%,10px);
+    background:var(--pine);
+    color:#fff;
+    padding:11px 18px;
+    border-radius:999px;
+    font:13px var(--font-body);
+    font-weight:500;
+    box-shadow:0 10px 28px rgba(0,0,0,.18);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .22s,transform .22s;
+    z-index:400;
+    max-width:84%;
+    text-align:center;
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0);}
+
+  /* ---------- Footer nav ---------- */
+  footer{
+    position:fixed;
+    bottom:0;
+    left:50%;
+    transform:translateX(-50%);
+    width:100%;
+    max-width:480px;
+    background:var(--surface);
+    border-top:1px solid var(--line);
+    display:flex;
+    justify-content:space-around;
+    padding:8px 4px 12px;
+    z-index:200;
+  }
+  .nav-btn{
+    background:none;
+    border:none;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+    color:var(--muted);
+    font:600 10.5px var(--font-body);
+    padding:6px 16px;
+    border-radius:12px;
+    cursor:pointer;
+  }
+  .nav-btn.active{color:var(--pine);background:rgba(31,58,48,.08);}
+  .nav-icon{position:relative;display:inline-flex;}
+  .nav-icon svg{width:21px;height:21px;}
+  .nav-badge{
+    position:absolute;
+    top:-4px;right:-8px;
+    background:var(--saffron);
+    color:var(--ink);
+    font:800 9.5px var(--font-body);
+    min-width:16px;height:16px;
+    border-radius:999px;
+    display:none;
+    align-items:center;justify-content:center;
+    padding:0 3px;
+  }
+
+  /* ---------- Product detail page ---------- */
+  .detail-back{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:none;
+    border:none;
+    color:var(--muted);
+    font:500 13px var(--font-body);
+    cursor:pointer;
+    padding:0 0 12px 0;
+  }
+  .detail-back:hover{color:var(--ink);}
+  .detail-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    overflow:hidden;
+  }
+  .detail-swatch{
+    aspect-ratio:1/1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    background:#2F4F46;
+    overflow:hidden;
+  }
+  .detail-swatch img{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+  .detail-swatch svg{width:30%;height:30%;color:#fff;opacity:.9;}
+  .detail-body{padding:18px;}
+  .detail-name{font:600 20px var(--font-display);color:var(--ink);margin-bottom:6px;}
+  .detail-category{font:13px var(--font-body);color:var(--muted);margin-bottom:8px;}
+  .detail-price{font:700 22px var(--font-body);color:var(--pine);margin-bottom:12px;}
+  .detail-desc{font:14px/1.6 var(--font-body);color:var(--muted);margin-bottom:16px;}
+  .detail-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .detail-actions .btn{flex:1;min-width:120px;}
+  .follow-btn{
+    background:none;
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:6px 14px;
+    font:600 12px var(--font-body);
+    color:var(--muted);
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    transition:all .15s;
+  }
+  .follow-btn.following{
+    background:var(--pine);
+    color:#fff;
+    border-color:var(--pine);
+  }
+  .follow-btn:hover{opacity:.8;}
+
+  /* ---------- Filter modal ---------- */
+  .filter-option{
+    padding:12px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .filter-option:last-child{border-bottom:0;}
+  .filter-label{
+    font:600 12px var(--font-body);
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    color:var(--muted);
+    display:block;
+    margin-bottom:8px;
+  }
+  .filter-tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .filter-tag{
+    padding:6px 14px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:#fff;
+    font:500 12px var(--font-body);
+    color:var(--ink);
+    cursor:pointer;
+    transition:all .12s;
+  }
+  .filter-tag:hover{background:var(--bg);}
+  .filter-tag.active{
+    background:var(--pine);
+    color:#fff;
+    border-color:var(--pine);
+  }
+  .filter-range{
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+  .filter-range input{
+    flex:1;
+    padding:8px 12px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font:13px var(--font-body);
+    width:100%;
+    outline:none;
+  }
+  .filter-range input:focus{border-color:var(--pine);}
+  .filter-range span{color:var(--muted);font-size:13px;}
+
+  /* ---------- Notification ---------- */
+  .notification{
+    position:fixed;
+    top:0;
+    left:50%;
+    transform:translateX(-50%) translateY(-100%);
+    width:100%;
+    max-width:480px;
+    background:var(--pine);
+    color:#fff;
+    padding:14px 18px;
+    font:14px var(--font-body);
+    font-weight:500;
+    z-index:500;
+    box-shadow:0 4px 20px rgba(0,0,0,.15);
+    transition:transform .35s cubic-bezier(.22,.68,0,1);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .notification.show{transform:translateX(-50%) translateY(0);}
+  .notification-close{
+    background:none;
+    border:none;
+    color:rgba(255,255,255,.7);
+    font-size:20px;
+    cursor:pointer;
+    padding:0 4px;
+  }
+  .notification-close:hover{color:#fff;}
+
+  /* ---------- Accessibility ---------- */
+  button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{
+    outline:2px solid var(--pine);
+    outline-offset:2px;
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important;}
+  }
 </style>
 </head>
 <body>
@@ -102,86 +969,828 @@
 </div>
 
 <script>
-// =====================================================
-// API URL - YOUR LIVE BACKEND
-// =====================================================
-const API_URL = 'https://shop-backend-x00h.onrender.com/api';
-
-// =====================================================
-// TRANSLATIONS (keep your full translation object here)
-// =====================================================
+/* =====================================================
+   TRANSLATIONS
+===================================================== */
 const TRANSLATIONS = {
-  // ... keep ALL your translations from your original file ...
+  en: {
+    brand_tag: "Ethiopia's Marketplace",
+    search_placeholder: "Search products, brands and categories",
+    home_title: "All products",
+    cart_title: "Your bag",
+    nav_home: "Home",
+    nav_cart: "Cart",
+    nav_upload: "Upload",
+    nav_store: "Store",
+    back: "← Back",
+    sell_title: "Sell on Sho P",
+    sell_copy: "Reach shoppers across Ethiopia and manage your shop right from your phone.",
+    login: "Log in",
+    create_shop: "Create shop",
+    auth_login_title: "Log in to your shop",
+    auth_login_sub: "Welcome back — sign in to manage your shop.",
+    auth_signup_title: "Create your shop",
+    auth_signup_sub: "Set up your seller profile to start listing products.",
+    full_name: "Full name",
+    shop_name: "Shop name",
+    phone: "Phone number",
+    password: "Password",
+    create_shop_btn: "Create shop & start selling",
+    login_btn: "Log in",
+    already_have: "Already have a shop?",
+    new_to_shop: "New to Sho P?",
+    create_one: "Create one",
+    list_product: "List a new product",
+    product_name: "Product name",
+    category: "Category",
+    price: "Price (ETB)",
+    quantity: "Quantity",
+    description: "Description",
+    listing_fee: "Listing fee",
+    balance: "Balance",
+    publish: "Publish listing (5 ETB)",
+    add_photo: "Add a photo",
+    account_balance: "Account balance",
+    add_funds: "Add funds",
+    send_friend: "Send to friend",
+    settings: "Settings",
+    logout: "Logout",
+    user_id: "User ID",
+    products: "Products",
+    total_sales: "Total sales",
+    followers: "Followers",
+    your_listings: "Your listings",
+    edit: "Edit",
+    mark_sold: "Mark sold out",
+    mark_available: "Mark available",
+    unavailable: "Unavailable",
+    out_of_stock: "Out of stock",
+    in_stock: "in stock",
+    empty_bag: "Your bag is empty",
+    empty_bag_copy: "Add products you love and they'll show up here.",
+    browse_products: "Browse products",
+    subtotal: "Subtotal",
+    checkout: "Checkout",
+    order_placed: "Order placed!",
+    order_copy: "Your order of {total} is on its way. Thanks for shopping with Sho P.",
+    continue_shopping: "Continue shopping",
+    account_actions: "Account actions",
+    account_sub: "Add funds to your account or send to a friend.",
+    amount: "Amount (ETB)",
+    payment_method: "Payment method",
+    transaction_ref: "Transaction reference (phone number or account)",
+    confirm_deposit: "Confirm deposit",
+    friends_id: "Friend's User ID",
+    friends_id_hint: "Ask your friend for their User ID (found in their Store page)",
+    your_password: "Your password (to confirm)",
+    send_warning: "⚠️ This will send money from your balance to your friend's account.",
+    send_money: "Send money",
+    cancel: "Cancel",
+    deposit_test: "💡 For testing, just click 'Confirm deposit' and your balance will update instantly.",
+    no_payment_methods: "No payment methods added yet.",
+    add_payment_method: "Add payment method",
+    payment_provider: "Payment provider",
+    account_number: "Account / phone number",
+    done: "Done",
+    remove: "Remove",
+    filter_title: "Filter products",
+    filter_sub: "Narrow down products by category and price range.",
+    category_filter: "Category",
+    all: "All",
+    price_range: "Price range (ETB)",
+    min: "Min",
+    max: "Max",
+    clear_all: "Clear all",
+    apply_filters: "Apply filters",
+    no_products: "No products found",
+    no_products_copy: "Nothing matches your search. Try a different term.",
+    no_products_filter: "Try changing your filters.",
+    follow: "+ Follow store",
+    following: "✓ Following",
+    add_to_bag: "Add to bag",
+    no_description: "No description available.",
+    need_shop: "You need a shop to list products",
+    need_shop_copy: "Create a seller account to start uploading products to Sho P.",
+    go_to_store: "Go to Store",
+    welcome_back: "Welcome back!",
+    welcome: "Welcome to Sho P!",
+    shop_created: "✅ Shop created! Please login now.",
+    auth_failed: "❌ Authentication failed",
+    connection_error: "❌ Cannot connect to backend. Is it running?",
+    logged_out: "Logged out",
+    session_expired: "Session expired. Please login again.",
+    please_login: "Please login to view details",
+    please_login_cart: "Please login to add to cart",
+    added_to_bag: "Added to bag",
+    removed_from_bag: "Removed from bag",
+    status_updated: "Status updated",
+    listing_updated: "Listing updated",
+    listing_published: "Listing published! 5 ETB fee deducted.",
+    failed_publish: "Failed to publish",
+    insufficient_balance: "Insufficient balance. Add funds to list products.",
+    valid_name_price: "Add a product name and price to publish.",
+    valid_amount: "Please enter a valid amount.",
+    valid_reference: "Please enter your phone number or account reference.",
+    valid_user_id: "Please enter a valid User ID.",
+    valid_password: "Please enter your password to confirm.",
+    deposit_success: "{amount} ETB added via {method}!",
+    deposit_failed: "Deposit failed",
+    send_success: "{amount} ETB sent to User #{id}!",
+    send_failed: "Transfer failed",
+    error_updating: "Error updating status",
+    error_adding: "Error adding to cart",
+    error_updating_cart: "Error updating cart",
+    error_removing: "Error removing from cart",
+    error_checkout: "Error placing order",
+    error_loading: "Error loading product",
+    error_follow: "Error updating follow",
+    error_connection: "Connection error",
+    error_deposit: "Deposit failed",
+    error_send: "Transfer failed",
+    filters_applied: "Filters applied",
+    filters_cleared: "Filters cleared",
+    language: "Language / ቋንቋ / Afaan / ቋንቋ",
+    language_sub: "Choose your preferred language for the app.",
+    language_set: "Language set to {lang}",
+    english: "English",
+    amharic: "Amharic",
+    oromiffa: "Oromiffa",
+    tigrigna: "Tigrigna"
+  },
+  am: {
+    brand_tag: "የኢትዮጵያ ገበያ ቦታ",
+    search_placeholder: "ምርቶችን፣ ብራንዶችን እና ምድቦችን ይፈልጉ",
+    home_title: "ሁሉም ምርቶች",
+    cart_title: "የእርስዎ ከረጢት",
+    nav_home: "መነሻ",
+    nav_cart: "ከረጢት",
+    nav_upload: "ስቀል",
+    nav_store: "ሱቅ",
+    back: "← ተመለስ",
+    sell_title: "በሾ ፒ ላይ ይሸጡ",
+    sell_copy: "በመላው ኢትዮጵያ ገዢዎችን ያግኙ እና ሱቅዎን ከስልክዎ ያስተዳድሩ።",
+    login: "ግቡ",
+    create_shop: "ሱቅ ይፍጠሩ",
+    auth_login_title: "ወደ ሱቅዎ ይግቡ",
+    auth_login_sub: "እንኳን በደህና መጡ — ሱቅዎን ለማስተዳደር ይግቡ።",
+    auth_signup_title: "ሱቅዎን ይፍጠሩ",
+    auth_signup_sub: "ምርቶችን መስቀል ለመጀመር የሻጭ መገለጫዎን ያዘጋጁ።",
+    full_name: "ሙሉ ስም",
+    shop_name: "የሱቅ ስም",
+    phone: "ስልክ ቁጥር",
+    password: "የይለፍ ቃል",
+    create_shop_btn: "ሱቅ ይፍጠሩ እና መሸጥ ይጀምሩ",
+    login_btn: "ግቡ",
+    already_have: "አስቀድሞ ሱቅ አለዎት?",
+    new_to_shop: "ለሾ ፒ አዲስ ነዎት?",
+    create_one: "አዲስ ይፍጠሩ",
+    list_product: "አዲስ ምርት ይስቀሉ",
+    product_name: "የምርት ስም",
+    category: "ምድብ",
+    price: "ዋጋ (ብር)",
+    quantity: "ብዛት",
+    description: "መግለጫ",
+    listing_fee: "የመስቀያ ክፍያ",
+    balance: "ቀሪ ሂሳብ",
+    publish: "ምርት ይስቀሉ (5 ብር)",
+    add_photo: "ፎቶ ያክሉ",
+    account_balance: "የሂሳብ ቀሪ",
+    add_funds: "ገንዘብ ያክሉ",
+    send_friend: "ለጓደኛ ይላኩ",
+    settings: "ቅንብሮች",
+    logout: "ውጣ",
+    user_id: "የተጠቃሚ መታወቂያ",
+    products: "ምርቶች",
+    total_sales: "ጠቅላላ ሽያጭ",
+    followers: "ተከታዮች",
+    your_listings: "የእርስዎ ምርቶች",
+    edit: "አርትዕ",
+    mark_sold: "ተሽጧል ምልክት ያድርጉ",
+    mark_available: "ይገኛል ምልክት ያድርጉ",
+    unavailable: "አይገኝም",
+    out_of_stock: "ክምችት የለም",
+    in_stock: "ክምችት አለ",
+    empty_bag: "የእርስዎ ከረጢት ባዶ ነው",
+    empty_bag_copy: "የሚወዷቸውን ምርቶች ያክሉ እና እዚህ ይታያሉ።",
+    browse_products: "ምርቶችን ይመልከቱ",
+    subtotal: "ጠቅላላ",
+    checkout: "ግዢ ያጠናቅቁ",
+    order_placed: "ትዕዛዝ ተመዝግቧል!",
+    order_copy: "የእርስዎ {total} ትዕዛዝ በመንገድ ላይ ነው። ሾ ፒ ላይ ስለገዙ እናመሰግናለን።",
+    continue_shopping: "መግዛት ይቀጥሉ",
+    account_actions: "የሂሳብ ተግባራት",
+    account_sub: "ወደ ሂሳብዎ ገንዘብ ያክሉ ወይም ለጓደኛ ይላኩ።",
+    amount: "ገንዘብ (ብር)",
+    payment_method: "የክፍያ ዘዴ",
+    transaction_ref: "የግብይት ማጣቀሻ (ስልክ ቁጥር ወይም አካውንት)",
+    confirm_deposit: "ተቀባይነት ያረጋግጡ",
+    friends_id: "የጓደኛ መታወቂያ",
+    friends_id_hint: "ጓደኛዎን መታወቂያ ይጠይቁ (በሱቃቸው ገጽ ላይ ይገኛል)",
+    your_password: "የይለፍ ቃልዎ (ለማረጋገጥ)",
+    send_warning: "⚠️ ይህ ከሂሳብዎ ወደ ጓደኛዎ ሂሳብ ገንዘብ ይልካል።",
+    send_money: "ገንዘብ ይላኩ",
+    cancel: "ይቅር",
+    deposit_test: "💡 ለሙከራ፣ 'ተቀባይነት ያረጋግጡ' የሚለውን ጠቅ ያድርጉ እና ቀሪ ሂሳብዎ ወዲያውኑ ይዘምናል።",
+    no_payment_methods: "እስካሁን ምንም የክፍያ ዘዴዎች አልተጨመሩም።",
+    add_payment_method: "የክፍያ ዘዴ ያክሉ",
+    payment_provider: "የክፍያ አቅራቢ",
+    account_number: "አካውንት / ስልክ ቁጥር",
+    done: "ተከናውኗል",
+    remove: "አስወግድ",
+    filter_title: "ምርቶችን አጣራ",
+    filter_sub: "ምርቶችን በምድብ እና በዋጋ ክልል ይጥቀሱ።",
+    category_filter: "ምድብ",
+    all: "ሁሉም",
+    price_range: "የዋጋ ክልል (ብር)",
+    min: "ዝቅተኛ",
+    max: "ከፍተኛ",
+    clear_all: "ሁሉንም አጽዳ",
+    apply_filters: "አጣራ",
+    no_products: "ምርቶች አልተገኙም",
+    no_products_copy: "ከፍለጋዎ ጋር የሚዛመድ ምርት አልተገኘም። ሌላ ቃል ይሞክሩ።",
+    no_products_filter: "ማጣሪያዎችዎን ለመቀየር ይሞክሩ።",
+    follow: "+ ሱቅ ይከተሉ",
+    following: "✓ እየተከተሉ ነው",
+    add_to_bag: "ወደ ከረጢት ያክሉ",
+    no_description: "ምንም መግለጫ የለም።",
+    need_shop: "ምርቶችን ለመስቀል ሱቅ ያስፈልግዎታል",
+    need_shop_copy: "ወደ ሾ ፒ ምርቶችን መስቀል ለመጀመር የሻጭ አካውንት ይፍጠሩ።",
+    go_to_store: "ወደ ሱቅ ይሂዱ",
+    welcome_back: "እንኳን በደህና መጡ!",
+    welcome: "እንኳን ወደ ሾ ፒ በደህና መጡ!",
+    shop_created: "✅ ሱቅ ተፈጥሯል! እባክዎ አሁን ይግቡ።",
+    auth_failed: "❌ ማረጋገጫ አልተሳካም",
+    connection_error: "❌ ከተመላላሽ ጋር መገናኘት አልቻለም። እየሰራ ነው?",
+    logged_out: "ወጥተዋል",
+    session_expired: "ክፍለ ጊዜዎ አልቋል። እባክዎ እንደገና ይግቡ።",
+    please_login: "ዝርዝሮችን ለማየት እባክዎ ይግቡ",
+    please_login_cart: "ወደ ከረጢት ለመጨመር እባክዎ ይግቡ",
+    added_to_bag: "ወደ ከረጢት ተጨምሯል",
+    removed_from_bag: "ከከረጢት ተወግዷል",
+    status_updated: "ሁኔታ ተዘምኗል",
+    listing_updated: "ምርት ተዘምኗል",
+    listing_published: "ምርት ተስቅሏል! 5 ብር ተቀንሷል።",
+    failed_publish: "መስቀል አልተሳካም",
+    insufficient_balance: "በቂ ገንዘብ የለም። ምርቶችን ለመስቀል ገንዘብ ያክሉ።",
+    valid_name_price: "ለመስቀል የምርት ስም እና ዋጋ ያስፈልጋል።",
+    valid_amount: "እባክዎ ትክክለኛ ገንዘብ ያስገቡ።",
+    valid_reference: "እባክዎ ስልክ ቁጥርዎን ወይም የአካውንት ማጣቀሻ ያስገቡ።",
+    valid_user_id: "እባክዎ ትክክለኛ የተጠቃሚ መታወቂያ ያስገቡ።",
+    valid_password: "እባክዎ የይለፍ ቃልዎን ለማረጋገጥ ያስገቡ።",
+    deposit_success: "{amount} ብር በ{method} ተጨምሯል!",
+    deposit_failed: "ገንዘብ መጨመር አልተሳካም",
+    send_success: "{amount} ብር ለተጠቃሚ #{id} ተልኳል!",
+    send_failed: "መላክ አልተሳካም",
+    error_updating: "ሁኔታ ማዘመን አልተሳካም",
+    error_adding: "ወደ ከረጢት መጨመር አልተሳካም",
+    error_updating_cart: "ከረጢት ማዘመን አልተሳካም",
+    error_removing: "ከከረጢት ማስወገድ አልተሳካም",
+    error_checkout: "ትዕዛዝ መመዝገብ አልተሳካም",
+    error_loading: "ምርት መጫን አልተሳካም",
+    error_follow: "መከተል ማዘመን አልተሳካም",
+    error_connection: "የግንኙነት ስህተት",
+    error_deposit: "ገንዘብ መጨመር አልተሳካም",
+    error_send: "መላክ አልተሳካም",
+    filters_applied: "ማጣሪያዎች ተተግብረዋል",
+    filters_cleared: "ማጣሪያዎች ተጽደዋል",
+    language: "ቋንቋ",
+    language_sub: "ለመተግበሪያው የሚመርጡትን ቋንቋ ይምረጡ።",
+    language_set: "ቋንቋ ወደ {lang} ተቀይሯል",
+    english: "እንግሊዝኛ",
+    amharic: "አማርኛ",
+    oromiffa: "ኦሮሚፋ",
+    tigrigna: "ትግርኛ"
+  },
+  om: {
+    brand_tag: "Gabaa Itoophiyaa",
+    search_placeholder: "Urjii, maqaa daldalaa fi gosoota barbaadi",
+    home_title: "Urjii hunda",
+    cart_title: "Kooftii keessan",
+    nav_home: "Mana",
+    nav_cart: "Kooftii",
+    nav_upload: "Baafadhu",
+    nav_store: "Dukana",
+    back: "← Duuba",
+    sell_title: "Sho P irratti gurguri",
+    sell_copy: "Itoophiyaa guutuu keessatti bitattoota ga'iitii dukana keessan bilbilaa keessan irraa bulchaa.",
+    login: "Seenuu",
+    create_shop: "Dukana uumi",
+    auth_login_title: "Dukana keessan seenuu",
+    auth_login_sub: "Baga nagaan dhufatan — dukana keessan bulchuuf seenaa.",
+    auth_signup_title: "Dukana keessan uumi",
+    auth_signup_sub: "Urjii baafachuu eegaluuf piroofaayilii gurguraa keessan qopheessaa.",
+    full_name: "Maqaa guutuu",
+    shop_name: "Maqaa dukanaa",
+    phone: "Lakkoofsa bilbilaa",
+    password: "Jecha iccitii",
+    create_shop_btn: "Dukana uumiitii gurguruu eegali",
+    login_btn: "Seenuu",
+    already_have: "Dukana qabduu?",
+    new_to_shop: "Sho P haaraa?",
+    create_one: "Haaraa uumi",
+    list_product: "Urjii haaraa baafadhu",
+    product_name: "Maqaa urjii",
+    category: "Gosa",
+    price: "Gatii (Birrii)",
+    quantity: "Baay'ina",
+    description: "Ibsa",
+    listing_fee: "Kaffaltii baafachuu",
+    balance: "Hambaa",
+    publish: "Urjii baafadhu (5 Birrii)",
+    add_photo: "Fotoo dabali",
+    account_balance: "Hambaa akawuntii",
+    add_funds: "Maallaqa dabali",
+    send_friend: "Firaaf ergi",
+    settings: "Qindaa'ina",
+    logout: "Baasi",
+    user_id: "ID fayyadamaa",
+    products: "Urjii",
+    total_sales: "Gurgura waliigalaa",
+    followers: "Hordoftoota",
+    your_listings: "Urjii keessan",
+    edit: "Gulaali",
+    mark_sold: "Gurgurame akka ta'e mallatteessi",
+    mark_available: "Akka argamu mallatteessi",
+    unavailable: "Hin argamu",
+    out_of_stock: "Hin argamu",
+    in_stock: "Argama",
+    empty_bag: "Kooftiin keessan duwwaa dha",
+    empty_bag_copy: "Urjii jaallattan dabalaa asitti mul'atu.",
+    browse_products: "Urjii ilaali",
+    subtotal: "Iddoo waliigalaa",
+    checkout: "Bituu xumuri",
+    order_placed: "Ajajaan galmeeffamee jira!",
+    order_copy: "Ajajaan keessan {total} karaa irra jira. Sho P irratti bituu keessan galateeffanna.",
+    continue_shopping: "Bituu itti fufi",
+    account_actions: "Gochaawwan akawuntii",
+    account_sub: "Akawuntii keessan maallaqa dabalaa yookiin firaaf ergaa.",
+    amount: "Maallaqa (Birrii)",
+    payment_method: "Haala kaffaltii",
+    transaction_ref: "Wabii tooraa (lakkoofsa bilbilaa yookiin akawuntii)",
+    confirm_deposit: "Ragaaleessa",
+    friends_id: "ID firaa",
+    friends_id_hint: "ID firaa keessan gaafadhaa (fuula dukanaa isaanii irra argama)",
+    your_password: "Jecha iccitii keessan (ragaaleessuuf)",
+    send_warning: "⚠️ Kun akawuntii keessan irraa gara akawuntii firaa keessaniitti maallaqa erga.",
+    send_money: "Maallaqa ergi",
+    cancel: "Haqi",
+    deposit_test: "💡 Qorannoof, 'Ragaaleessa' tuquu fi hambaan keessan yeroo sana dabala.",
+    no_payment_methods: "Haala kaffaltii tokko illee hin dabalamne.",
+    add_payment_method: "Haala kaffaltii dabali",
+    payment_provider: "Kennaa kaffaltii",
+    account_number: "Akawuntii / lakkoofsa bilbilaa",
+    done: "Xumurame",
+    remove: "Balli",
+    filter_title: "Urjii sissoo",
+    filter_sub: "Urjii gosaan yookiin gatiiin sissoo.",
+    category_filter: "Gosa",
+    all: "Hunda",
+    price_range: "Daangaa gatii (Birrii)",
+    min: "Xinnaa",
+    max: "Ol'aanaa",
+    clear_all: "Hunda balleessi",
+    apply_filters: "Sissi",
+    no_products: "Urjii hin argamne",
+    no_products_copy: "Wanti barbaachisaan keessan wajjin walsimu hin argamne. Jecha biraa qorraa.",
+    no_products_filter: "Sissoo keessan jijjiiruu qoraa.",
+    follow: "+ Dukana hordofi",
+    following: "✓ Hordofaa jirtu",
+    add_to_bag: "Kooftii dabali",
+    no_description: "Ibsi hin jiru.",
+    need_shop: "Urjii baafachuuf dukana barbaadda",
+    need_shop_copy: "Urjii Sho P baafachuu eegaluuf akawuntii gurguraa uumi.",
+    go_to_store: "Dukana dhaqi",
+    welcome_back: "Baga nagaan dhufatan!",
+    welcome: "Baga Sho P nagaan dhufatan!",
+    shop_created: "✅ Dukana uumamee jira! Mee seenaa.",
+    auth_failed: "❌ Seenuun hin milkoofne",
+    connection_error: "❌ Backend wajjin quunnamuu hin dandeenye. Hojjechaa jiraa?",
+    logged_out: "Baafatamte",
+    session_expired: "Yeroon keessan dhumee jira. Mee irra deddeebi'aa seenaa.",
+    please_login: "Ibsa ilaaluuf mee seenaa",
+    please_login_cart: "Kooftii dabaluuf mee seenaa",
+    added_to_bag: "Kooftii dabalame",
+    removed_from_bag: "Kooftii irraa balleeffame",
+    status_updated: "Haalni haaraa",
+    listing_updated: "Urjiin haaraa",
+    listing_published: "Urjiin baafatame! 5 Birrii bu'ame.",
+    failed_publish: "Baafachuun hin milkoofne",
+    insufficient_balance: "Maallaqni hin gaaru. Urjii baafachuuf maallaqa dabali.",
+    valid_name_price: "Maqaa fi gatii urjii seeni.",
+    valid_amount: "Maallaqa sirrii seeni.",
+    valid_reference: "Lakkoofsa bilbilaa yookiin wabii akawuntii seeni.",
+    valid_user_id: "ID fayyadamaa sirrii seeni.",
+    valid_password: "Jecha iccitii keessan ragaaleessuuf seeni.",
+    deposit_success: "{amount} Birrii {method} dabalame!",
+    deposit_failed: "Dabaluun hin milkoofne",
+    send_success: "{amount} Birrii fayyadamaa #{id} iff ergame!",
+    send_failed: "Erguun hin milkoofne",
+    error_updating: "Haala haara'uun hin milkoofne",
+    error_adding: "Kooftii dabaluun hin milkoofne",
+    error_updating_cart: "Kooftii haara'uun hin milkoofne",
+    error_removing: "Kooftii irraa balleessuun hin milkoofne",
+    error_checkout: "Ajajaan galmeessuun hin milkoofne",
+    error_loading: "Urjii baachuun hin milkoofne",
+    error_follow: "Hordofuu haara'uun hin milkoofne",
+    error_connection: "Quunnamtii dogoggora",
+    error_deposit: "Maallaqa dabaluun hin milkoofne",
+    error_send: "Erguun hin milkoofne",
+    filters_applied: "Sissi fayyadame",
+    filters_cleared: "Sissi balleeffame",
+    language: "Afaan",
+    language_sub: "Afaan appii filadhu.",
+    language_set: "Afaan {lang} filatame",
+    english: "Ingiliffaa",
+    amharic: "Amaaraa",
+    oromiffa: "Oromoo",
+    tigrigna: "Tigriignaa"
+  },
+  ti: {
+    brand_tag: "ገበያ ኢትዮጵያ",
+    search_placeholder: "ምርትታት፣ ብራንዳትን ምድብታትን ድለዩ",
+    home_title: "ኩሎም ምርትታት",
+    cart_title: "ከረጢትኩም",
+    nav_home: "ገዛ",
+    nav_cart: "ከረጢት",
+    nav_upload: "ኣብሕ",
+    nav_store: "ዱካን",
+    back: "← ተመለስ",
+    sell_title: "ኣብ ሾ ፒ ሸጡ",
+    sell_copy: "ምሉእ ኢትዮጵያ ገዝተኛታት ረክቡ እሞ ዱካንኩም ካብ ተሌፎንኩም ኣቀናዕርዎ።",
+    login: "እቶ",
+    create_shop: "ዱካን ፍጠሩ",
+    auth_login_title: "ናብ ዱካንኩም እቶ",
+    auth_login_sub: "እንቋዕ ብደሓን መጻእኩም — ዱካንኩም ንምቅናዕ እቶ።",
+    auth_signup_title: "ዱካንኩም ፍጠሩ",
+    auth_signup_sub: "ምርትታት ንምጥቃት መገለጺ ሻጊ ኣዳሉ።",
+    full_name: "ምሉእ ስም",
+    shop_name: "ስም ዱካን",
+    phone: "ቁጽሪ ተሌፎን",
+    password: "ቃል ምስጢር",
+    create_shop_btn: "ዱካን ፍጠሩ እሞ ምሽጣር ጀምሩ",
+    login_btn: "እቶ",
+    already_have: "ዱካን ኣለኩምዶ?",
+    new_to_shop: "ናብ ሾ ፒ ሓዱሽዶ?",
+    create_one: "ሓድሽ ፍጠሩ",
+    list_product: "ምርቲ ሓድሽ ኣብሑ",
+    product_name: "ስም ምርቲ",
+    category: "ምድብ",
+    price: "ዋጋ (ብር)",
+    quantity: "ብዝሒ",
+    description: "መግለጺ",
+    listing_fee: "ክፍሊት ምጥቃት",
+    balance: "ቀሪ",
+    publish: "ምርቲ ኣብሑ (5 ብር)",
+    add_photo: "ፎቶ ውስኹ",
+    account_balance: "ቀሪ ሒሳብ",
+    add_funds: "ገንዘብ ውስኹ",
+    send_friend: "ናብ ፈተውቲ ሰደዱ",
+    settings: "ምድላው",
+    logout: "ውጹ",
+    user_id: "ID ተጠቃሚ",
+    products: "ምርትታት",
+    total_sales: "ሽያጭ ኩሉ",
+    followers: "ሰዓብቲ",
+    your_listings: "ምርትታትኩም",
+    edit: "ኣርትዕ",
+    mark_sold: "ተሽይጡ ምልክት ግበሩ",
+    mark_available: "ክእከል ምልክት ግበሩ",
+    unavailable: "ኣይከኣልን",
+    out_of_stock: "ክምችት የለን",
+    in_stock: "ክምችት ኣሎ",
+    empty_bag: "ከረጢትኩም ባዶ እዩ",
+    empty_bag_copy: "ምርትታት ዝፈትዉዎ ውስኹ እሞ ኣብዚ ክተርእዩ እዮም።",
+    browse_products: "ምርትታት ርአዩ",
+    subtotal: "ድምር",
+    checkout: "ምዕዛዝ ኣጠናቅዑ",
+    order_placed: "ምዕዛዝ ተመዝጊቡ!",
+    order_copy: "ምዕዛዝኩም {total} ኣብ መንገዲ እዩ። ኣብ ሾ ፒ ስለ ዝገዛእኩም የመስግንና።",
+    continue_shopping: "ምግዛእ ቀጽሉ",
+    account_actions: "ንቕጡባት ሒሳብ",
+    account_sub: "ናብ ሒሳብኩም ገንዘብ ውስኹ ወይ ናብ ፈተውቲ ሰደዱ።",
+    amount: "ገንዘብ (ብር)",
+    payment_method: "መትሓዝ ክፍሊት",
+    transaction_ref: "መጠቃለሊ ምትሕውዋጥ (ቁጽሪ ተሌፎን ወይ ሒሳብ)",
+    confirm_deposit: "ኣረጋግጹ",
+    friends_id: "ID ፈተወይ",
+    friends_id_hint: "ንፈተወይኩም ID ሓተቱ (ኣብ ገጽ ዱካኖም ይርከብ)",
+    your_password: "ቃል ምስጢርኩም (ንምረጋገጽ)",
+    send_warning: "⚠️ እዚ ካብ ሒሳብኩም ናብ ሒሳብ ፈተወይኩም ገንዘብ ይሰድድ።",
+    send_money: "ገንዘብ ሰደዱ",
+    cancel: "ኣትርፉ",
+    deposit_test: "💡 ንምርመራ፣ 'ኣረጋግጹ' ጠውቁ እሞ ቀሪ ሒሳብኩም ብኡብኡ ይዓዲ።",
+    no_payment_methods: "ክሳብ ሕጂ መትሓዝ ክፍሊት ኣይተዋሰኸን።",
+    add_payment_method: "መትሓዝ ክፍሊት ውስኹ",
+    payment_provider: "ኣቅራቢ ክፍሊት",
+    account_number: "ሒሳብ / ቁጽሪ ተሌፎን",
+    done: "ተገይሩ",
+    remove: "ኣልግስዎ",
+    filter_title: "ምርትታት ኣጽርዩ",
+    filter_sub: "ምርትታት ብምድብ ወይ ብዋጋ ኣጽርዩ።",
+    category_filter: "ምድብ",
+    all: "ኩሉ",
+    price_range: "ደረጃ ዋጋ (ብር)",
+    min: "ንእሽቶ",
+    max: "ዓብዪ",
+    clear_all: "ኩሉ ኣጽርዩ",
+    apply_filters: "ኣብ ግብኣት ኣእትዉ",
+    no_products: "ምርትታት ኣይተረኽቡን",
+    no_products_copy: "ምስ ምድላይኩም ዝሰማማዕ ኣይተረኽበን። ካልእ ቃል ፈትኑ።",
+    no_products_filter: "ማጽረያታትኩም ምቅያር ፈትኑ።",
+    follow: "+ ዱካን ስዓቡ",
+    following: "✓ እትስዕቡ ኣለኹም",
+    add_to_bag: "ናብ ከረጢት ውስኹ",
+    no_description: "መግለጺ የለን።",
+    need_shop: "ምርትታት ንምጥቃት ዱካን ኣድልዩኩም",
+    need_shop_copy: "ናብ ሾ ፒ ምርትታት ንምጥቃት ሒሳብ ሻጊ ፍጠሩ።",
+    go_to_store: "ናብ ዱካን ኪዱ",
+    welcome_back: "እንቋዕ ብደሓን መጻእኩም!",
+    welcome: "እንቋዕ ናብ ሾ ፒ ብደሓን መጻእኩም!",
+    shop_created: "✅ ዱካን ተፈጢሩ! በጃኹም ሕጂ እቶ።",
+    auth_failed: "❌ ምእታው ኣይተሓለፈን",
+    connection_error: "❌ ምስ backend ተራኽቦ ኣይከኣለን። ይሰርሕ ድዩ?",
+    logged_out: "ወጺኹም",
+    session_expired: "ግዜኹም ኣልቋል። በጃኹም እንደገና እቶ።",
+    please_login: "ዝርዝራት ንምርኣይ በጃኹም እቶ",
+    please_login_cart: "ናብ ከረጢት ንምውሳኽ በጃኹም እቶ",
+    added_to_bag: "ናብ ከረጢት ተዋሲኹ",
+    removed_from_bag: "ካብ ከረጢት ተሓሲሱ",
+    status_updated: "ኩነት ተዓዲሙ",
+    listing_updated: "ምርቲ ተዓዲሙ",
+    listing_published: "ምርቲ ተጢቒዑ! 5 ብር ተቀኒሱ።",
+    failed_publish: "ምጥቃት ኣይተሓለፈን",
+    insufficient_balance: "ገንዘብ ኣይበቅእን። ምርትታት ንምጥቃት ገንዘብ ውስኹ።",
+    valid_name_price: "ስምን ዋጋን ምርቲ ኣእትዉ።",
+    valid_amount: "በጃኹም ቅኑዕ ገንዘብ ኣእትዉ።",
+    valid_reference: "በጃኹም ቁጽሪ ተሌፎንኩም ወይ መጠቃለሊ ሒሳብ ኣእትዉ።",
+    valid_user_id: "በጃኹም ቅኑዕ ID ተጠቃሚ ኣእትዉ።",
+    valid_password: "በጃኹም ቃል ምስጢርኩም ንምረጋገጽ ኣእትዉ።",
+    deposit_success: "{amount} ብር ብ{method} ተዋሲኹ!",
+    deposit_failed: "ምውሳኽ ኣይተሓለፈን",
+    send_success: "{amount} ብር ናብ ተጠቃሚ #{id} ተላኢኹ!",
+    send_failed: "ምልኣኽ ኣይተሓለፈን",
+    error_updating: "ኩነት ምዕዳይ ኣይተሓለፈን",
+    error_adding: "ናብ ከረጢት ምውሳኽ ኣይተሓለፈን",
+    error_updating_cart: "ከረጢት ምዕዳይ ኣይተሓለፈን",
+    error_removing: "ካብ ከረጢት ምሕሳስ ኣይተሓለፈን",
+    error_checkout: "ምዕዛዝ ምምዝገብ ኣይተሓለፈን",
+    error_loading: "ምርቲ ምጽዓን ኣይተሓለፈን",
+    error_follow: "ምስዓብ ምዕዳይ ኣይተሓለፈን",
+    error_connection: "ጌጋ ራኽቦ",
+    error_deposit: "ምውሳኽ ኣይተሓለፈን",
+    error_send: "ምልኣኽ ኣይተሓለፈን",
+    filters_applied: "ማጽረያታት ተተጒዮም",
+    filters_cleared: "ማጽረያታት ተሓሲሶም",
+    language: "ቋንቋ",
+    language_sub: "ንመተግበሪታ ዝመርጥዎ ቋንቋ ምረጹ።",
+    language_set: "ቋንቋ ናብ {lang} ተቐይሩ",
+    english: "እንግሊዝ",
+    amharic: "ኣማርኛ",
+    oromiffa: "ኦሮሚፋ",
+    tigrigna: "ትግርኛ"
+  }
 };
 
-// =====================================================
-// FIXED: CREATE SHOP FUNCTION
-// =====================================================
+/* =====================================================
+   ICONS
+===================================================== */
+const ICONS = {
+  home:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11.5 12 4l8.5 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M9.5 19.5v-5.5h5v5.5"/></svg>`,
+  bag:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 8.5V7a3.5 3.5 0 0 1 7 0v1.5"/><path d="M5.8 8.5h12.4l-1 12a1 1 0 0 1-1 .9H7.8a1 1 0 0 1-1-.9z"/></svg>`,
+  plus:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5.5v13M5.5 12h13"/></svg>`,
+  minus:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 12h13"/></svg>`,
+  store:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5 5.5 4.5h13L20 9.5"/><path d="M4.5 9.5v10h15v-10"/><path d="M9.5 19.5v-5a2.5 2.5 0 0 1 5 0v5"/></svg>`,
+  search:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M19.3 19.3 15.2 15.2"/></svg>`,
+  trash:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14"/><path d="M9 7V5.2A1.2 1.2 0 0 1 10.2 4h3.6A1.2 1.2 0 0 1 15 5.2V7"/><path d="M7 7l1 13h8l1-13"/></svg>`,
+  pencil:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19.5 5.8 16 16 5.8a1.7 1.7 0 0 1 2.4 0 1.7 1.7 0 0 1 0 2.4L8.2 18.4z"/><path d="M14.2 7.6l2.4 2.4"/></svg>`,
+  check:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M8.3 12.3l2.4 2.4 5-5.2"/></svg>`,
+  camera:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 8.2h3l1.3-2h6.4l1.3 2h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.4"/></svg>`,
+  user:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 19.5a7 7 0 0 1 14 0"/></svg>`,
+  package:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.2 12 4l8 4.2v8L12 20.4 4 16.4z"/><path d="M4 8.2 12 12l8-3.8"/><path d="M12 12v8.4"/></svg>`,
+  users:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9.5" r="3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17.2" cy="10" r="2.3"/><path d="M15.6 13.3a4.4 4.4 0 0 1 4.9 4.4"/></svg>`,
+  banknote:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="7.5" width="17" height="10" rx="1.6"/><circle cx="12" cy="12.5" r="2.4"/><path d="M6 9.7h.01M18 15.3h.01"/></svg>`,
+  chip:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="1.4"/><path d="M9 7V4.3M12 7V4.3M15 7V4.3M9 17v2.7M12 17v2.7M15 17v2.7M7 9H4.3M7 12H4.3M7 15H4.3M17 9h2.7M17 12h2.7M17 15h2.7"/></svg>`,
+  hanger:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5.2" r="1.3"/><path d="M12 6.5v1.7"/><path d="M4 18.3 12 12l8 6.3"/><path d="M4 18.3h16"/></svg>`,
+  lamp:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5h8l-2.1 6.3H10.1z"/><path d="M12 11.3v6.4"/><path d="M8.3 20.3h7.4"/></svg>`,
+  droplet:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.3s5.4 6.5 5.4 10.4a5.4 5.4 0 1 1-10.8 0c0-3.9 5.4-10.4 5.4-10.4z"/></svg>`,
+  dumbbell:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 9.5v5M7 8v8"/><path d="M17 8v8M19.5 9.5v5"/><path d="M7 12h10"/></svg>`,
+  book:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.7c-1.5-1.3-3.6-1.8-7-1.8v12.6c3.4 0 5.5.5 7 1.8 1.5-1.3 3.6-1.8 7-1.8V4.9c-3.4 0-5.5.5-7 1.8z"/><path d="M12 6.7v12.6"/></svg>`,
+  block:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.3 19 8v8l-7 3.7-7-3.7V8z"/><path d="M5 8l7 3.7L19 8"/><path d="M12 11.7v7.8"/></svg>`,
+  basket:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5.3 10h13.4l-1.6 9.5H6.9z"/><path d="M9.3 10 8.3 4.7M14.7 10l1-5.3M5.3 10h13.4M9.6 13.6v3M14.4 13.6v3"/></svg>`,
+  filter:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M8 12h8M11 17h2"/></svg>`,
+  settings:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
+  logout_icon:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`,
+  globe:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
+  check_circle:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+};
+function icon(name){
+  const svg = ICONS[name] || '';
+  return svg.replace('<svg ', '<svg class="icon" ');
+}
+
+/* =====================================================
+   TRANSLATION HELPER
+===================================================== */
+function t(key, replacements){
+  const lang = currentLanguage || 'en';
+  let text = TRANSLATIONS[lang]?.[key] || TRANSLATIONS['en'][key] || key;
+  if(replacements){
+    for(const [k, v] of Object.entries(replacements)){
+      text = text.replace(`{${k}}`, v);
+    }
+  }
+  return text;
+}
+
+/* =====================================================
+   CONFIG — Backend API URL
+===================================================== */
+const API_URL = 'https://shop-backend-x00h.onrender.com/api';
+
+/* =====================================================
+   HELPERS
+===================================================== */
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function formatETB(n){
+  return Math.round(Number(n)||0).toLocaleString('en-US') + ' ETB';
+}
+function initials(name){
+  const parts = (name||'').trim().split(/\s+/).filter(Boolean);
+  if(!parts.length) return '?';
+  return parts.slice(0,2).map(w=>w[0].toUpperCase()).join('');
+}
+function getToken(){
+  return localStorage.getItem('token');
+}
+function getHeaders(){
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + getToken()
+  };
+}
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+function showNotification(msg){
+  const n = document.getElementById('notification');
+  document.getElementById('notification-msg').textContent = msg;
+  n.classList.add('show');
+  clearTimeout(notificationTimer);
+  notificationTimer = setTimeout(()=>n.classList.remove('show'), 4000);
+}
+function hideNotification(){
+  document.getElementById('notification').classList.remove('show');
+}
+function emptyStateHTML(iconName,title,copy,targetPage,btnLabel){
+  return `<div class="empty-state">
+    <div class="empty-icon">${icon(iconName)}</div>
+    <p class="empty-title">${title}</p>
+    <p class="empty-copy">${copy}</p>
+    ${targetPage ? `<button class="btn btn-outline" onclick="showPage('${targetPage}')">${btnLabel}</button>` : ''}
+  </div>`;
+}
+function handleApiError(res){
+  if(res.status === 401){
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    isLogged = false;
+    showToast(t('session_expired'));
+    renderStore();
+    return true;
+  }
+  return false;
+}
+
+/* =====================================================
+   CATEGORIES
+===================================================== */
+const CATEGORIES = {
+  electronics:{ label:'Electronics',    color:'#2F4F46', icon:'chip' },
+  fashion:    { label:'Fashion',        color:'#9C5B45', icon:'hanger' },
+  home:       { label:'Home & Living',  color:'#7A6A52', icon:'lamp' },
+  beauty:     { label:'Beauty',         color:'#8E5A7A', icon:'droplet' },
+  sports:     { label:'Sports',         color:'#3E6B5C', icon:'dumbbell' },
+  books:      { label:'Books',          color:'#4A5568', icon:'book' },
+  toys:       { label:'Toys & Kids',    color:'#B07A3E', icon:'block' },
+  grocery:    { label:'Grocery',        color:'#5C7A4A', icon:'basket' },
+};
+
+/* =====================================================
+   STATE
+===================================================== */
+let cart = [];
+let isLogged = false;
+let seller = null;
+let sellerProducts = [];
+let authMode = 'login';
+let authAvatar = null;
+let pendingPhoto = null;
+let pendingPhotoFile = null;
+let toastTimer = null;
+let notificationTimer = null;
+let previousPage = 'home';
+let selectedProductId = null;
+let allProducts = [];
+let followedStores = [];
+let filterCategory = null;
+let filterMinPrice = null;
+let filterMaxPrice = null;
+let currentLanguage = 'en';
+
+/* =====================================================
+   UPDATE UI LANGUAGE
+===================================================== */
+function updateUILanguage(){
+  document.getElementById('brand-tag').textContent = t('brand_tag');
+  document.getElementById('search-input').placeholder = t('search_placeholder');
+  document.getElementById('home-title').textContent = t('home_title');
+  document.getElementById('cart-title').textContent = t('cart_title');
+  document.getElementById('detail-back').textContent = t('back');
+  document.getElementById('nav-home').textContent = t('nav_home');
+  document.getElementById('nav-cart').textContent = t('nav_cart');
+  document.getElementById('nav-upload').textContent = t('nav_upload');
+  document.getElementById('nav-store').textContent = t('nav_store');
+}
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+function showPage(id, skipRender){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.page===id));
+
+  const searchRow = document.getElementById('search-row');
+  if(id === 'home'){
+    searchRow.classList.remove('hidden');
+  } else {
+    searchRow.classList.add('hidden');
+  }
+
+  if(!skipRender){
+    renderPage(id);
+  }
+  window.scrollTo(0,0);
+}
+function renderPage(id){
+  if(id==='home') renderHome(document.getElementById('search-input').value);
+  else if(id==='cart') renderCart();
+  else if(id==='upload') renderUpload();
+  else if(id==='store') renderStore();
+}
+function doSearch(){ renderHome(document.getElementById('search-input').value); }
+
+/* =====================================================
+   AUTH — Login / Signup (FIXED)
+===================================================== */
 async function createShop() {
-  // Get values from the form
   const fullName = document.getElementById('a-name')?.value?.trim() || '';
   const shopName = document.getElementById('a-shop')?.value?.trim() || '';
   const phone = document.getElementById('a-phone')?.value?.trim() || '';
   const password = document.getElementById('a-password')?.value?.trim() || '';
 
-  // Validate
   if (!fullName || !shopName || !phone || !password) {
     showToast('⚠️ Please fill in all fields!');
     return;
   }
 
-  // Show loading
   const btn = document.querySelector('#modal-box .btn-fill');
-  if (btn) {
-    btn.textContent = '⏳ Creating...';
-    btn.disabled = true;
-  }
+  if (btn) { btn.textContent = '⏳ Creating...'; btn.disabled = true; }
 
   try {
-    const response = await fetch(`${API_URL}/create-shop`, {
+    const res = await fetch(`${API_URL}/create-shop`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        fullName, 
-        shopName, 
-        phone, 
-        password 
-      })
+      body: JSON.stringify({ fullName, shopName, phone, password })
     });
-
-    const data = await response.json();
-    console.log('📦 Server response:', data);
+    const data = await res.json();
 
     if (data.success) {
-      // Save token and user info
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       isLogged = true;
       seller = data.user;
-      
       closeModal();
       showToast('✅ Shop created successfully! 🎉');
       showPage('store');
       await loadSellerProducts();
       renderStore();
     } else {
-      showToast('❌ Error: ' + (data.error || 'Something went wrong'));
+      showToast('❌ ' + (data.error || 'Something went wrong'));
     }
-  } catch (error) {
-    console.error('❌ Create shop error:', error);
-    showToast('❌ Cannot connect to backend. Is it running?');
+  } catch (err) {
+    showToast('❌ Cannot connect to backend');
   }
 
-  // Reset button
-  if (btn) {
-    btn.textContent = 'Create shop & start selling';
-    btn.disabled = false;
-  }
+  if (btn) { btn.textContent = 'Create shop & start selling'; btn.disabled = false; }
 }
 
-// =====================================================
-// FIXED: LOGIN FUNCTION
-// =====================================================
 async function login() {
   const shopName = document.getElementById('a-shop')?.value?.trim() || '';
   const password = document.getElementById('a-password')?.value?.trim() || '';
@@ -192,13 +1801,12 @@ async function login() {
   }
 
   try {
-    const response = await fetch(`${API_URL}/login`, {
+    const res = await fetch(`${API_URL}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ shopName, password })
     });
-
-    const data = await response.json();
+    const data = await res.json();
 
     if (data.success) {
       localStorage.setItem('token', data.token);
@@ -213,60 +1821,1112 @@ async function login() {
     } else {
       showToast('❌ ' + (data.error || 'Login failed'));
     }
-  } catch (error) {
+  } catch (err) {
     showToast('❌ Cannot connect to backend');
   }
 }
 
-// =====================================================
-// FIXED: RENDER AUTH MODAL (connects buttons to functions)
-// =====================================================
-function renderAuthModal() {
+function renderAuthModal(){
   const isSignup = authMode === 'signup';
   const box = document.getElementById('modal-box');
   
   box.innerHTML = `
     <div class="sheet-handle"></div>
-    <h2 class="modal-title">${isSignup ? 'Create your shop' : 'Log in to your shop'}</h2>
-    <p class="modal-sub">${isSignup ? 'Set up your seller profile to start listing products.' : 'Welcome back — sign in to manage your shop.'}</p>
+    <h2 class="modal-title">${isSignup ? t('auth_signup_title') : t('auth_login_title')}</h2>
+    <p class="modal-sub">${isSignup ? t('auth_signup_sub') : t('auth_login_sub')}</p>
     
-    <div class="field">
-      <label>Full name</label>
-      <input type="text" id="a-name" placeholder="e.g. Lulit Bekele" required>
-    </div>
-    
-    <div class="field">
-      <label>Shop name</label>
-      <input type="text" id="a-shop" placeholder="e.g. Lulit Electronics" required>
-    </div>
-    
-    ${isSignup ? `
-      <div class="field">
-        <label>Phone number</label>
-        <input type="tel" id="a-phone" placeholder="+251 9XX XXX XXX">
-      </div>
-    ` : ''}
-    
-    <div class="field">
-      <label>Password</label>
-      <input type="password" id="a-password" placeholder="••••••••" required>
-    </div>
+    <div class="field"><label>${t('full_name')}</label><input type="text" id="a-name" placeholder="e.g. Lulit Bekele" required></div>
+    <div class="field"><label>${t('shop_name')}</label><input type="text" id="a-shop" placeholder="e.g. Lulit Electronics" required></div>
+    ${isSignup ? `<div class="field"><label>${t('phone')}</label><input type="tel" id="a-phone" placeholder="+251 9XX XXX XXX"></div>` : ''}
+    <div class="field"><label>${t('password')}</label><input type="password" id="a-password" placeholder="••••••••" required></div>
     
     <button class="btn btn-fill btn-block" onclick="${isSignup ? 'createShop()' : 'login()'}">
-      ${isSignup ? 'Create shop & start selling' : 'Log in'}
+      ${isSignup ? t('create_shop_btn') : t('login_btn')}
     </button>
     
-    <p class="modal-switch">
-      ${isSignup ? 'Already have a shop?' : 'New to Sho P?'} 
-      <a onclick="switchAuthMode()">${isSignup ? 'Log in' : 'Create one'}</a>
-    </p>
+    <p class="modal-switch">${isSignup ? t('already_have') : t('new_to_shop')} <a onclick="switchAuthMode()">${isSignup ? t('login') : t('create_one')}</a></p>
   `;
 }
 
-// =====================================================
-// (Keep ALL your other JavaScript functions here)
-// =====================================================
-// ... all your existing functions (loadProducts, renderHome, etc.) ...
+async function submitAuth(){
+  // This is kept for compatibility but we now use createShop and login directly
+  if(authMode === 'signup') {
+    await createShop();
+  } else {
+    await login();
+  }
+}
+
+async function logout(){
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  isLogged = false;
+  seller = null;
+  sellerProducts = [];
+  renderStore();
+  showToast(t('logged_out'));
+}
+
+/* =====================================================
+   PRODUCTS — Load from backend
+===================================================== */
+async function loadProducts(){
+  try {
+    const res = await fetch(`${API_URL}/products`, {
+      headers: getHeaders()
+    });
+    if(res.status === 401){
+      localStorage.removeItem('token');
+      isLogged = false;
+      return [];
+    }
+    const data = await res.json();
+    allProducts = data || [];
+    followedStores = allProducts.filter(p => p.is_followed).map(p => p.seller_shop);
+    followedStores = [...new Set(followedStores)];
+    return allProducts;
+  } catch(err){
+    console.error('Load products error:', err);
+    return [];
+  }
+}
+
+async function loadSellerProducts(){
+  try {
+    const res = await fetch(`${API_URL}/seller/products`, {
+      headers: getHeaders()
+    });
+    if(res.status === 401){
+      localStorage.removeItem('token');
+      isLogged = false;
+      return;
+    }
+    const data = await res.json();
+    sellerProducts = data || [];
+  } catch(err){
+    console.error('Load seller products error:', err);
+  }
+}
+
+async function loadCart(){
+  try {
+    const res = await fetch(`${API_URL}/cart`, {
+      headers: getHeaders()
+    });
+    if(res.status === 401){
+      localStorage.removeItem('token');
+      isLogged = false;
+      return;
+    }
+    const data = await res.json();
+    cart = data || [];
+    updateCartBadge();
+    return cart;
+  } catch(err){
+    console.error('Load cart error:', err);
+  }
+}
+
+async function loadBalance(){
+  try {
+    const res = await fetch(`${API_URL}/balance`, {
+      headers: getHeaders()
+    });
+    if(res.status === 401){
+      localStorage.removeItem('token');
+      isLogged = false;
+      return 0;
+    }
+    const data = await res.json();
+    return data.balance || 0;
+  } catch(err){
+    return 0;
+  }
+}
+
+/* =====================================================
+   HOME
+===================================================== */
+function productCardHTML(p){
+  const cat = CATEGORIES[p.category] || CATEGORIES.electronics;
+  return `<div class="product-card" onclick="openDetail(${p.id})">
+    <div class="card-swatch" style="background:${cat.color}">
+      ${p.photo ? `<img src="https://shop-backend-x00h.onrender.com${p.photo}" alt="${escapeHtml(p.name)}">` : icon(cat.icon)}
+      <span class="cat-chip">${cat.label}</span>
+    </div>
+    <div class="card-body">
+      <p class="card-name">${escapeHtml(p.name)}</p>
+      <p style="font:11px var(--font-body);color:var(--muted);">${escapeHtml(p.seller_shop || 'Unknown store')}</p>
+      <div class="card-footer">
+        <span class="price-tag">${formatETB(p.price)}</span>
+        <button class="add-fab" onclick="event.stopPropagation();addToCart(${p.id})" aria-label="Add to bag">${icon('plus')}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function renderHome(filter){
+  filter = filter || '';
+  const q = filter.trim().toLowerCase();
+
+  let list = await loadProducts();
+
+  if(q){
+    list = list.filter(p =>
+      p.name.toLowerCase().includes(q) ||
+      (CATEGORIES[p.category]?.label?.toLowerCase() || '').includes(q) ||
+      (p.seller_shop || '').toLowerCase().includes(q)
+    );
+  }
+
+  if(filterCategory){
+    list = list.filter(p => p.category === filterCategory);
+  }
+  if(filterMinPrice !== null){
+    list = list.filter(p => p.price >= filterMinPrice);
+  }
+  if(filterMaxPrice !== null){
+    list = list.filter(p => p.price <= filterMaxPrice);
+  }
+
+  list.sort((a,b) => {
+    const aFollowed = followedStores.includes(a.seller_shop);
+    const bFollowed = followedStores.includes(b.seller_shop);
+    if(aFollowed && !bFollowed) return -1;
+    if(!aFollowed && bFollowed) return 1;
+    return 0;
+  });
+
+  document.getElementById('home-count').textContent = list.length;
+  const grid = document.getElementById('home-grid');
+  const empty = document.getElementById('home-empty');
+  if(list.length === 0){
+    grid.style.display = 'none';
+    const msg = filterCategory ? t('no_products_filter') : t('no_products_copy');
+    empty.innerHTML = emptyStateHTML('search', t('no_products'), msg, null, '');
+  } else {
+    grid.style.display = 'grid';
+    empty.innerHTML = '';
+    grid.innerHTML = list.map(productCardHTML).join('');
+  }
+}
+
+/* =====================================================
+   PRODUCT DETAIL
+===================================================== */
+async function openDetail(id){
+  try {
+    const res = await fetch(`${API_URL}/products/${id}`, {
+      headers: getHeaders()
+    });
+    if(res.status === 401){
+      localStorage.removeItem('token');
+      isLogged = false;
+      showToast(t('please_login'));
+      return;
+    }
+    const p = await res.json();
+    if(!p) return;
+
+    selectedProductId = id;
+    previousPage = document.querySelector('.page.active')?.id || 'home';
+
+    const cat = CATEGORIES[p.category] || CATEGORIES.electronics;
+    const isFollowing = followedStores.includes(p.seller_shop);
+
+    document.getElementById('detail-content').innerHTML = `
+      <div class="detail-card">
+        <div class="detail-swatch" style="background:${cat.color}">
+          ${p.photo ? `<img src="https://shop-backend-x00h.onrender.com${p.photo}" alt="${escapeHtml(p.name)}">` : icon(cat.icon)}
+        </div>
+        <div class="detail-body">
+          <p class="detail-name">${escapeHtml(p.name)}</p>
+          <p class="detail-category">${cat.label} • ${escapeHtml(p.seller_shop || 'Unknown store')}</p>
+          <p class="detail-price">${formatETB(p.price)}</p>
+          <p class="detail-desc">${escapeHtml(p.description || t('no_description'))}</p>
+          <div class="detail-actions">
+            <button class="btn btn-fill" onclick="addToCart(${p.id});showToast(t('added_to_bag'))">${icon('bag')} ${t('add_to_bag')}</button>
+            <button class="follow-btn ${isFollowing ? 'following' : ''}" onclick="toggleFollow('${escapeHtml(p.seller_shop)}', ${p.seller_id})">
+              ${isFollowing ? t('following') : t('follow')}
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    showPage('detail', true);
+    window.scrollTo(0,0);
+  } catch(err){
+    showToast(t('error_loading'));
+  }
+}
+
+function goBackFromDetail(){
+  showPage(previousPage);
+  if(previousPage === 'home') renderHome(document.getElementById('search-input').value);
+}
+
+async function toggleFollow(storeName, sellerId){
+  const isFollowing = followedStores.includes(storeName);
+  const method = isFollowing ? 'DELETE' : 'POST';
+
+  try {
+    const res = await fetch(`${API_URL}/follow/${sellerId}`, {
+      method: method,
+      headers: getHeaders()
+    });
+    if(!res.ok){
+      showToast(t('error_follow'));
+      return;
+    }
+    if(isFollowing){
+      followedStores = followedStores.filter(s => s !== storeName);
+      showNotification(`Unfollowed ${storeName}`);
+    } else {
+      followedStores.push(storeName);
+      showNotification(`Following ${storeName}`);
+    }
+    if(document.getElementById('detail').classList.contains('active')){
+      openDetail(selectedProductId);
+    }
+    renderHome(document.getElementById('search-input').value);
+  } catch(err){
+    showToast(t('error_connection'));
+  }
+}
+
+/* =====================================================
+   FILTER MODAL
+===================================================== */
+function openFilterModal(){
+  const box = document.getElementById('modal-box');
+  const catOptions = Object.entries(CATEGORIES).map(([k,v]) =>
+    `<button class="filter-tag ${filterCategory === k ? 'active' : ''}" onclick="setFilterCategory('${k}')">${v.label}</button>`
+  ).join('');
+
+  box.innerHTML = `
+    <div class="sheet-handle"></div>
+    <h2 class="modal-title">${icon('filter')} ${t('filter_title')}</h2>
+    <p class="modal-sub">${t('filter_sub')}</p>
+
+    <div class="filter-option">
+      <span class="filter-label">${t('category_filter')}</span>
+      <div class="filter-tags">
+        <button class="filter-tag ${filterCategory === null ? 'active' : ''}" onclick="setFilterCategory(null)">${t('all')}</button>
+        ${catOptions}
+      </div>
+    </div>
+
+    <div class="filter-option">
+      <span class="filter-label">${t('price_range')}</span>
+      <div class="filter-range">
+        <input type="number" id="filter-min" placeholder="${t('min')}" value="${filterMinPrice !== null ? filterMinPrice : ''}" min="0">
+        <span>—</span>
+        <input type="number" id="filter-max" placeholder="${t('max')}" value="${filterMaxPrice !== null ? filterMaxPrice : ''}" min="0">
+      </div>
+    </div>
+
+    <div class="modal-actions" style="margin-top:16px;">
+      <button class="btn btn-outline btn-block" onclick="clearFilters()">${t('clear_all')}</button>
+      <button class="btn btn-fill btn-block" onclick="applyFilters()">${t('apply_filters')}</button>
+    </div>
+  `;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function setFilterCategory(cat){
+  filterCategory = cat;
+  openFilterModal();
+}
+
+function applyFilters(){
+  const minVal = document.getElementById('filter-min').value;
+  const maxVal = document.getElementById('filter-max').value;
+  filterMinPrice = minVal !== '' ? parseFloat(minVal) : null;
+  filterMaxPrice = maxVal !== '' ? parseFloat(maxVal) : null;
+  closeModal();
+  renderHome(document.getElementById('search-input').value);
+  showToast(t('filters_applied'));
+}
+
+function clearFilters(){
+  filterCategory = null;
+  filterMinPrice = null;
+  filterMaxPrice = null;
+  closeModal();
+  renderHome(document.getElementById('search-input').value);
+  showToast(t('filters_cleared'));
+}
+
+/* =====================================================
+   CART
+===================================================== */
+async function addToCart(id){
+  try {
+    const res = await fetch(`${API_URL}/cart`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ productId: id, quantity: 1 })
+    });
+    if(res.status === 401){
+      localStorage.removeItem('token');
+      isLogged = false;
+      showToast(t('please_login_cart'));
+      return;
+    }
+    const data = await res.json();
+    if(data.success){
+      await loadCart();
+      showToast(t('added_to_bag'));
+    }
+  } catch(err){
+    showToast(t('error_adding'));
+  }
+}
+
+async function changeQty(id, delta){
+  const item = cart.find(c => c.product_id === id);
+  if(!item) return;
+  const newQty = Math.max(1, Math.min(99, item.quantity + delta));
+  try {
+    await fetch(`${API_URL}/cart/${id}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify({ quantity: newQty })
+    });
+    await loadCart();
+    renderCart();
+  } catch(err){
+    showToast(t('error_updating_cart'));
+  }
+}
+
+async function removeFromCart(id){
+  try {
+    await fetch(`${API_URL}/cart/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    await loadCart();
+    renderCart();
+    showToast(t('removed_from_bag'));
+  } catch(err){
+    showToast(t('error_removing'));
+  }
+}
+
+function updateCartBadge(){
+  const count = cart.reduce((s,c)=>s+(c.quantity||0),0);
+  const badge = document.getElementById('cart-badge');
+  if(count>0){ badge.style.display='flex'; badge.textContent = count>99 ? '99+' : count; }
+  else { badge.style.display='none'; }
+}
+
+function cartItemHTML(c){
+  const cat = CATEGORIES[c.category] || CATEGORIES.electronics;
+  return `<div class="cart-item">
+    <div class="swatch" style="background:${cat.color}">
+      ${c.photo ? `<img src="https://shop-backend-x00h.onrender.com${c.photo}" alt="${escapeHtml(c.name)}">` : icon(cat.icon)}
+    </div>
+    <div class="cart-item-body">
+      <div class="cart-item-top">
+        <p class="card-name">${escapeHtml(c.name)}</p>
+        <button class="icon-btn" onclick="removeFromCart(${c.product_id})" aria-label="Remove">${icon('trash')}</button>
+      </div>
+      <div class="cart-item-bottom">
+        <span class="price-tag">${formatETB(c.price)}</span>
+        <div class="qty-stepper">
+          <button onclick="changeQty(${c.product_id},-1)" aria-label="Decrease">${icon('minus')}</button>
+          <span>${c.quantity}</span>
+          <button onclick="changeQty(${c.product_id},1)" aria-label="Increase">${icon('plus')}</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function renderCart(){
+  const wrap = document.getElementById('cart-content');
+  await loadCart();
+
+  if(cart.length === 0){
+    wrap.innerHTML = emptyStateHTML('bag', t('empty_bag'), t('empty_bag_copy'), 'home', t('browse_products'));
+    return;
+  }
+  const total = cart.reduce((s,c)=>s+c.price*(c.quantity||0),0);
+  wrap.innerHTML = cart.map(cartItemHTML).join('') + `
+    <div class="cart-summary">
+      <div class="summary-row"><span>${t('subtotal')}</span><span class="summary-amount">${formatETB(total)}</span></div>
+      <button class="btn btn-fill btn-block" onclick="checkout()">${icon('bag')} ${t('checkout')}</button>
+    </div>`;
+}
+
+async function checkout(){
+  if(cart.length === 0) return;
+  const total = cart.reduce((s,c)=>s+c.price*(c.quantity||0),0);
+
+  try {
+    const res = await fetch(`${API_URL}/orders`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ items: cart, total })
+    });
+    if(!res.ok) throw new Error('Checkout failed');
+    await loadCart();
+    document.getElementById('cart-content').innerHTML = `<div class="empty-state">
+      <div class="empty-icon">${icon('check')}</div>
+      <p class="empty-title">${t('order_placed')}</p>
+      <p class="empty-copy">${t('order_copy').replace('{total}', formatETB(total))}</p>
+      <button class="btn btn-fill" onclick="showPage('home')">${t('continue_shopping')}</button>
+    </div>`;
+    updateCartBadge();
+  } catch(err){
+    showToast(t('error_checkout'));
+  }
+}
+
+/* =====================================================
+   UPLOAD
+===================================================== */
+function categoryOptions(selected){
+  return Object.entries(CATEGORIES).map(([k,v])=>
+    `<option value="${k}" ${k===selected ? 'selected' : ''}>${v.label}</option>`
+  ).join('');
+}
+
+async function renderUpload(){
+  const wrap = document.getElementById('upload-content');
+  if(!isLogged){
+    wrap.innerHTML = emptyStateHTML('store', t('need_shop'), t('need_shop_copy'), 'store', t('go_to_store'));
+    return;
+  }
+
+  const balance = await loadBalance();
+
+  wrap.innerHTML = `
+    <div class="form-card">
+      <h2 class="section-title" style="margin-bottom:16px;">${t('list_product')}</h2>
+      <label class="photo-picker" id="photo-picker">
+        <input type="file" accept="image/*" id="photo-input" onchange="handlePhotoSelect(event)" hidden>
+        ${pendingPhoto
+          ? `<img src="${pendingPhoto}" alt="Product photo">`
+          : `<span class="ph-icon">${icon('camera')}</span><span class="ph-hint">${t('add_photo')}</span>`}
+      </label>
+      <div class="field"><label>${t('product_name')}</label><input type="text" id="f-name" placeholder="e.g. Wireless Earbuds Pro"></div>
+      <div class="field"><label>${t('category')}</label><select id="f-category">${categoryOptions('electronics')}</select></div>
+      <div class="field-row">
+        <div class="field"><label>${t('price')}</label><input type="number" id="f-price" min="0" placeholder="0"></div>
+        <div class="field"><label>${t('quantity')}</label><input type="number" id="f-qty" min="0" placeholder="0"></div>
+      </div>
+      <div class="field"><label>${t('description')}</label><textarea id="f-desc" placeholder="Add details buyers should know — condition, size, materials..."></textarea></div>
+
+      <div style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
+        <span style="font:500 13px var(--font-body);color:var(--muted);">${t('listing_fee')}</span>
+        <span style="font:700 14px var(--font-body);color:var(--pine);">5 ETB</span>
+        <span style="font:500 12px var(--font-body);color:var(--muted);">${t('balance')}: ${formatETB(balance)}</span>
+      </div>
+
+      <button class="btn btn-fill btn-block" onclick="publishListing()">${icon('plus')} ${t('publish')}</button>
+    </div>`;
+}
+
+function handlePhotoSelect(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  pendingPhotoFile = file;
+  const reader = new FileReader();
+  reader.onload = () => { pendingPhoto = reader.result; renderUpload(); };
+  reader.readAsDataURL(file);
+}
+
+async function publishListing(){
+  const nameInput = document.getElementById('f-name');
+  const priceInput = document.getElementById('f-price');
+  const name = nameInput.value.trim();
+  const price = parseFloat(priceInput.value);
+  const qty = parseInt(document.getElementById('f-qty').value) || 0;
+  const category = document.getElementById('f-category').value;
+  const desc = document.getElementById('f-desc').value.trim();
+
+  nameInput.closest('.field').classList.toggle('field-error', !name);
+  priceInput.closest('.field').classList.toggle('field-error', !(price>0));
+  if(!name || !(price>0)){
+    showToast(t('valid_name_price'));
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('name', name);
+  formData.append('price', price);
+  formData.append('category', category);
+  formData.append('quantity', qty);
+  formData.append('description', desc);
+  if(pendingPhotoFile) formData.append('photo', pendingPhotoFile);
+
+  try {
+    const res = await fetch(`${API_URL}/products`, {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + getToken() },
+      body: formData
+    });
+    const data = await res.json();
+    if(!res.ok){
+      showToast(data.error || t('failed_publish'));
+      return;
+    }
+    pendingPhoto = null;
+    pendingPhotoFile = null;
+    await loadSellerProducts();
+    renderUpload();
+    renderStore();
+    showToast(t('listing_published'));
+  } catch(err){
+    showToast(t('error_connection'));
+  }
+}
+
+/* =====================================================
+   SETTINGS — Language selector
+===================================================== */
+function openSettingsModal(){
+  const box = document.getElementById('modal-box');
+  const languages = [
+    { code: 'en', name: t('english'), native: 'English' },
+    { code: 'am', name: t('amharic'), native: 'አማርኛ' },
+    { code: 'om', name: t('oromiffa'), native: 'Afaan Oromoo' },
+    { code: 'ti', name: t('tigrigna'), native: 'ትግርኛ' }
+  ];
+
+  box.innerHTML = `
+    <div class="sheet-handle"></div>
+    <h2 class="modal-title">${icon('globe')} ${t('language')}</h2>
+    <p class="modal-sub">${t('language_sub')}</p>
+    ${languages.map(lang => `
+      <div class="lang-option ${currentLanguage === lang.code ? 'active' : ''}" onclick="setLanguage('${lang.code}')">
+        <div>
+          <div class="lang-name">${lang.name}</div>
+          <div class="lang-native">${lang.native}</div>
+        </div>
+        <span class="lang-check">${icon('check_circle')}</span>
+      </div>
+    `).join('')}
+    <div class="modal-actions" style="margin-top:12px;">
+      <button class="btn btn-fill btn-block" onclick="closeModal()">${t('done')}</button>
+    </div>
+  `;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function setLanguage(code){
+  currentLanguage = code;
+  localStorage.setItem('language', code);
+  updateUILanguage();
+  showToast(t('language_set').replace('{lang}', code.toUpperCase()));
+  // Re-render current page with new language
+  const activePage = document.querySelector('.page.active')?.id || 'home';
+  renderPage(activePage);
+  openSettingsModal(); // refresh modal
+}
+
+/* =====================================================
+   STORE
+===================================================== */
+async function renderStore(){
+  const wrap = document.getElementById('store-content');
+  const token = getToken();
+  if(!token){
+    isLogged = false;
+    wrap.innerHTML = `
+      <div class="gate-card">
+        <div class="gate-icon">${icon('store')}</div>
+        <h2 class="gate-title">${t('sell_title')}</h2>
+        <p class="gate-copy">${t('sell_copy')}</p>
+        <div class="gate-actions">
+          <button class="btn btn-outline btn-block" onclick="openAuthModal('login')">${t('login')}</button>
+          <button class="btn btn-fill btn-block" onclick="openAuthModal('signup')">${t('create_shop')}</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  isLogged = true;
+
+  try {
+    const res = await fetch(`${API_URL}/auth/me`, {
+      headers: getHeaders()
+    });
+    if(res.status === 401){
+      localStorage.removeItem('token');
+      isLogged = false;
+      renderStore();
+      return;
+    }
+    const userData = await res.json();
+    seller = userData;
+  } catch(err){}
+
+  await loadSellerProducts();
+  const balance = await loadBalance();
+  const totalSales = sellerProducts.filter(p=>p.sold).reduce((s,p)=>s+p.price,0);
+
+  wrap.innerHTML = `
+    <div class="dash-card">
+      <div class="dash-actions">
+        <button class="settings-btn" onclick="openSettingsModal()" aria-label="${t('settings')}">
+          ${icon('settings')} ${t('settings')}
+        </button>
+        <button class="logout-btn" onclick="logout()" aria-label="${t('logout')}">
+          ${icon('logout_icon')} ${t('logout')}
+        </button>
+      </div>
+      <div class="dash-profile">
+        <div class="avatar">${seller?.avatar ? `<img src="${seller.avatar}" alt="">` : initials(seller?.name || 'User')}</div>
+        <div>
+          <p class="dash-name">${escapeHtml(seller?.name || 'User')}</p>
+          <p class="dash-shop">${icon('store')} ${escapeHtml(seller?.shop_name || 'My Shop')}</p>
+          <p style="font:11px var(--font-body);color:var(--muted);">🆔 ${t('user_id')}: ${seller?.id || 'N/A'}</p>
+        </div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-tile">${icon('package')}<span class="stat-num">${sellerProducts.length}</span><span class="stat-label">${t('products')}</span></div>
+        <div class="stat-tile">${icon('banknote')}<span class="stat-num">${formatETB(totalSales)}</span><span class="stat-label">${t('total_sales')}</span></div>
+        <div class="stat-tile">${icon('users')}<span class="stat-num">${seller?.followers?.toLocaleString('en-US') || 0}</span><span class="stat-label">${t('followers')}</span></div>
+      </div>
+
+      <div class="dash-payment-row">
+        <span class="dash-payment-label">${t('account_balance')}</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="dash-payment-balance">${formatETB(balance)}</span>
+          <button class="dash-payment-plus" onclick="openDepositModal()" aria-label="${t('add_funds')}">
+            +
+          </button>
+        </div>
+      </div>
+      <div style="margin-top:6px;text-align:right;display:flex;gap:6px;justify-content:flex-end;">
+        <button class="btn btn-sm btn-outline" onclick="openDepositModal()" style="font-size:11px;padding:4px 12px;">
+          ${icon('banknote')} ${t('add_funds')}
+        </button>
+        <button class="btn btn-sm btn-fill" onclick="openDepositModal();setTimeout(()=>switchDepositTab('send'),100)" style="font-size:11px;padding:4px 12px;background:var(--saffron);color:var(--ink);">
+          ${icon('users')} ${t('send_friend')}
+        </button>
+      </div>
+    </div>
+
+    <div class="section-row">
+      <h2 class="section-title">${t('your_listings')}</h2>
+      <span class="count-chip">${sellerProducts.length}</span>
+    </div>
+    <div class="grid">${sellerProducts.map(sellerCardHTML).join('')}</div>
+  `;
+}
+
+function sellerCardHTML(p){
+  const cat = CATEGORIES[p.category] || CATEGORIES.electronics;
+  const statusText = p.sold ? t('unavailable') : (p.quantity>0 ? p.quantity+' '+t('in_stock') : t('out_of_stock'));
+  return `<div class="product-card">
+    <div class="card-swatch" style="background:${cat.color}">
+      ${p.photo ? `<img src="https://shop-backend-x00h.onrender.com${p.photo}" alt="${escapeHtml(p.name)}">` : icon(cat.icon)}
+      ${p.sold ? `<div class="sold-overlay"><span>${t('mark_sold')}</span></div>` : ''}
+    </div>
+    <div class="card-body">
+      <p class="card-name">${escapeHtml(p.name)}</p>
+      <p class="stock-caption">${statusText}</p>
+      <div class="card-footer"><span class="price-tag">${formatETB(p.price)}</span></div>
+      <div class="seller-actions">
+        <button class="btn btn-outline btn-sm" onclick="openEditModal('${p.id}')">${icon('pencil')} ${t('edit')}</button>
+        <button class="btn btn-sm ${p.sold ? 'btn-outline' : 'btn-fill-pine'}" onclick="toggleSold('${p.id}')">${icon('check')} ${p.sold ? t('mark_available') : t('mark_sold')}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function toggleSold(id){
+  try {
+    const res = await fetch(`${API_URL}/products/${id}/toggle-sold`, {
+      method: 'PATCH',
+      headers: getHeaders()
+    });
+    if(!res.ok) throw new Error('Failed');
+    await loadSellerProducts();
+    renderStore();
+    showToast(t('status_updated'));
+  } catch(err){
+    showToast(t('error_updating'));
+  }
+}
+
+/* =====================================================
+   DEPOSIT & SEND MODAL
+===================================================== */
+function openDepositModal(){
+  const box = document.getElementById('modal-box');
+  box.innerHTML = `
+    <div class="sheet-handle"></div>
+    <h2 class="modal-title">${icon('banknote')} ${t('account_actions')}</h2>
+    <p class="modal-sub">${t('account_sub')}</p>
+
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button class="btn btn-fill" id="deposit-tab" onclick="switchDepositTab('deposit')" style="flex:1;background:var(--pine);color:#fff;">
+        ${icon('plus')} ${t('add_funds')}
+      </button>
+      <button class="btn btn-outline" id="send-tab" onclick="switchDepositTab('send')" style="flex:1;">
+        ${icon('users')} ${t('send_friend')}
+      </button>
+    </div>
+
+    <div id="deposit-form">
+      <div class="field">
+        <label>${t('amount')}</label>
+        <input type="number" id="deposit-amount" min="1" placeholder="e.g. 100" value="100">
+      </div>
+      <div class="field">
+        <label>${t('payment_method')}</label>
+        <select id="deposit-method">
+          <option value="Telebirr">Telebirr</option>
+          <option value="CBE Birr">CBE Birr</option>
+          <option value="Chapa">Chapa</option>
+          <option value="HelloCash">HelloCash</option>
+          <option value="Amole">Amole</option>
+          <option value="Bank transfer">Bank transfer</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>${t('transaction_ref')}</label>
+        <input type="text" id="deposit-ref" placeholder="e.g. 09XX XXX XXX">
+      </div>
+      <div style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:14px;">
+        <p style="font:13px var(--font-body);color:var(--muted);text-align:center;">${t('deposit_test')}</p>
+      </div>
+      <button class="btn btn-fill btn-block" onclick="confirmDeposit()" style="background:var(--pine);color:#fff;">
+        ${icon('check')} ${t('confirm_deposit')}
+      </button>
+    </div>
+
+    <div id="send-form" style="display:none;">
+      <div class="field">
+        <label>${t('friends_id')}</label>
+        <input type="number" id="send-user-id" placeholder="e.g. 3" min="1">
+        <p style="font:11px var(--font-body);color:var(--muted);margin-top:4px;">${t('friends_id_hint')}</p>
+      </div>
+      <div class="field">
+        <label>${t('amount')}</label>
+        <input type="number" id="send-amount" min="1" placeholder="e.g. 50" value="50">
+      </div>
+      <div class="field">
+        <label>${t('your_password')}</label>
+        <input type="password" id="send-password" placeholder="Enter your password">
+      </div>
+      <div style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:14px;">
+        <p style="font:13px var(--font-body);color:var(--muted);text-align:center;">${t('send_warning')}</p>
+      </div>
+      <button class="btn btn-fill btn-block" onclick="confirmSend()" style="background:var(--saffron);color:var(--ink);">
+        ${icon('users')} ${t('send_money')}
+      </button>
+    </div>
+
+    <div class="modal-actions" style="margin-top:10px;">
+      <button class="btn btn-outline btn-block" onclick="closeModal()">${t('cancel')}</button>
+    </div>
+  `;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function switchDepositTab(tab){
+  const depositTab = document.getElementById('deposit-tab');
+  const sendTab = document.getElementById('send-tab');
+  const depositForm = document.getElementById('deposit-form');
+  const sendForm = document.getElementById('send-form');
+
+  if(tab === 'deposit'){
+    depositTab.className = 'btn btn-fill btn-block';
+    depositTab.style.cssText = 'flex:1;background:var(--pine);color:#fff;';
+    sendTab.className = 'btn btn-outline btn-block';
+    sendTab.style.cssText = 'flex:1;';
+    depositForm.style.display = 'block';
+    sendForm.style.display = 'none';
+  } else {
+    sendTab.className = 'btn btn-fill btn-block';
+    sendTab.style.cssText = 'flex:1;background:var(--pine);color:#fff;';
+    depositTab.className = 'btn btn-outline btn-block';
+    depositTab.style.cssText = 'flex:1;';
+    depositForm.style.display = 'none';
+    sendForm.style.display = 'block';
+  }
+}
+
+async function confirmDeposit(){
+  const amountInput = document.getElementById('deposit-amount');
+  const methodInput = document.getElementById('deposit-method');
+  const refInput = document.getElementById('deposit-ref');
+
+  const amount = parseFloat(amountInput.value);
+  const method = methodInput.value;
+  const reference = refInput.value.trim();
+
+  if(!amount || amount <= 0){
+    showToast(t('valid_amount'));
+    return;
+  }
+  if(!reference){
+    showToast(t('valid_reference'));
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/balance/deposit`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ amount, method, reference })
+    });
+
+    const data = await res.json();
+
+    if(!res.ok){
+      showToast(data.error || t('deposit_failed'));
+      return;
+    }
+
+    closeModal();
+    showToast(t('deposit_success').replace('{amount}', amount).replace('{method}', method));
+    renderStore();
+  } catch(err){
+    showToast(t('error_connection'));
+    console.error('Deposit error:', err);
+  }
+}
+
+async function confirmSend(){
+  const userIdInput = document.getElementById('send-user-id');
+  const amountInput = document.getElementById('send-amount');
+  const passwordInput = document.getElementById('send-password');
+
+  const targetUserId = parseInt(userIdInput.value.trim());
+  const amount = parseFloat(amountInput.value);
+  const password = passwordInput.value.trim();
+
+  if(!targetUserId || targetUserId <= 0){
+    showToast(t('valid_user_id'));
+    return;
+  }
+  if(!amount || amount <= 0){
+    showToast(t('valid_amount'));
+    return;
+  }
+  if(!password){
+    showToast(t('valid_password'));
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/balance/send`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ targetUserId, amount, password })
+    });
+
+    const data = await res.json();
+
+    if(!res.ok){
+      showToast(data.error || t('send_failed'));
+      return;
+    }
+
+    closeModal();
+    showToast(t('send_success').replace('{amount}', amount).replace('{id}', targetUserId));
+    renderStore();
+  } catch(err){
+    showToast(t('error_connection'));
+    console.error('Send error:', err);
+  }
+}
+
+/* ---------- Payment method modal ---------- */
+async function openPaymentModal(){
+  const box = document.getElementById('modal-box');
+
+  let paymentMethods = [];
+  try {
+    const res = await fetch(`${API_URL}/payment-methods`, {
+      headers: getHeaders()
+    });
+    if(res.ok) paymentMethods = await res.json();
+  } catch(err){}
+
+  let methodsHTML = paymentMethods.length === 0
+    ? `<p style="color:var(--muted);font-size:13px;padding:8px 0;">${t('no_payment_methods')}</p>`
+    : paymentMethods.map((m) =>
+        `<div class="payment-method-item">
+          <div><span class="pm-name">${escapeHtml(m.name)}</span> <span class="pm-detail">${escapeHtml(m.detail)}</span></div>
+          <button class="pm-remove" onclick="removePaymentMethod(${m.id})">${t('remove')}</button>
+        </div>`
+      ).join('');
+
+  box.innerHTML = `
+    <div class="sheet-handle"></div>
+    <h2 class="modal-title">${t('add_payment_method')}</h2>
+    <p class="modal-sub">${t('add_payment_method')}</p>
+    ${methodsHTML}
+    <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:14px;">
+      <div class="field"><label>${t('payment_provider')}</label>
+        <select id="pm-select">
+          <option value="Telebirr">Telebirr</option>
+          <option value="CBE Birr">CBE Birr</option>
+          <option value="Chapa">Chapa</option>
+          <option value="HelloCash">HelloCash</option>
+          <option value="Amole">Amole</option>
+          <option value="Bank transfer">Bank transfer</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="field"><label>${t('account_number')}</label><input type="text" id="pm-detail" placeholder="e.g. 09XX XXX XXX"></div>
+      <button class="btn btn-fill btn-block" onclick="addPaymentMethod()">${icon('plus')} ${t('add_payment_method')}</button>
+    </div>
+    <div class="modal-actions" style="margin-top:12px;">
+      <button class="btn btn-outline btn-block" onclick="closeModal()">${t('done')}</button>
+    </div>
+  `;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+async function addPaymentMethod(){
+  const name = document.getElementById('pm-select').value;
+  const detail = document.getElementById('pm-detail').value.trim();
+  if(!detail){
+    showToast(t('valid_reference'));
+    return;
+  }
+  try {
+    await fetch(`${API_URL}/payment-methods`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ name, detail })
+    });
+    showToast(`${name} added.`);
+    openPaymentModal();
+    renderStore();
+  } catch(err){
+    showToast(t('error_connection'));
+  }
+}
+
+async function removePaymentMethod(id){
+  try {
+    await fetch(`${API_URL}/payment-methods/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    openPaymentModal();
+    renderStore();
+    showToast(t('removed_from_bag'));
+  } catch(err){
+    showToast(t('error_connection'));
+  }
+}
+
+/* ---------- Edit listing modal ---------- */
+function openEditModal(id){
+  const p = sellerProducts.find(x=>String(x.id)===String(id));
+  if(!p) return;
+  document.getElementById('modal-box').innerHTML = `
+    <div class="sheet-handle"></div>
+    <h2 class="modal-title">${t('edit')} ${t('listing')}</h2>
+    <p class="modal-sub">${t('edit')} ${t('listing')}</p>
+    <div class="field"><label>${t('product_name')}</label><input type="text" id="e-name" value="${escapeHtml(p.name)}"></div>
+    <div class="field"><label>${t('category')}</label><select id="e-category">${categoryOptions(p.category)}</select></div>
+    <div class="field-row">
+      <div class="field"><label>${t('price')}</label><input type="number" id="e-price" min="0" value="${p.price}"></div>
+      <div class="field"><label>${t('quantity')}</label><input type="number" id="e-qty" min="0" value="${p.quantity}"></div>
+    </div>
+    <div class="field"><label>${t('description')}</label><textarea id="e-desc">${escapeHtml(p.description||'')}</textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-block" onclick="closeModal()">${t('cancel')}</button>
+      <button class="btn btn-fill btn-block" onclick="saveEdit('${p.id}')">${t('edit')}</button>
+    </div>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+async function saveEdit(id){
+  const p = sellerProducts.find(x=>String(x.id)===String(id));
+  if(!p) return;
+  const nameInput = document.getElementById('e-name');
+  const priceInput = document.getElementById('e-price');
+  const name = nameInput.value.trim();
+  const price = parseFloat(priceInput.value);
+  nameInput.closest('.field').classList.toggle('field-error', !name);
+  priceInput.closest('.field').classList.toggle('field-error', !(price>=0) || isNaN(price));
+  if(!name || isNaN(price) || price<0){
+    showToast(t('valid_name_price'));
+    return;
+  }
+
+  try {
+    await fetch(`${API_URL}/products/${id}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify({
+        name,
+        category: document.getElementById('e-category').value,
+        price,
+        quantity: parseInt(document.getElementById('e-qty').value) || 0,
+        description: document.getElementById('e-desc').value.trim(),
+        sold: p.sold ? 1 : 0
+      })
+    });
+    closeModal();
+    await loadSellerProducts();
+    renderStore();
+    showToast(t('listing_updated'));
+  } catch(err){
+    showToast(t('error_connection'));
+  }
+}
+
+/* ---------- Auth modal ---------- */
+function openAuthModal(mode){
+  authMode = mode;
+  authAvatar = null;
+  renderAuthModal();
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function switchAuthMode(){
+  authMode = authMode === 'signup' ? 'login' : 'signup';
+  renderAuthModal();
+}
+
+/* ---------- Modal shared ---------- */
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.getElementById('modal-box').innerHTML = '';
+}
+document.getElementById('modal-overlay').addEventListener('click', e=>{
+  if(e.target.id === 'modal-overlay') closeModal();
+});
+document.getElementById('search-input').addEventListener('keydown', e=>{
+  if(e.key === 'Enter'){ e.preventDefault(); doSearch(); }
+});
+
+/* =====================================================
+   INIT
+===================================================== */
+(async function init(){
+  const token = getToken();
+  const savedLang = localStorage.getItem('language');
+  if(savedLang) currentLanguage = savedLang;
+  updateUILanguage();
+
+  if(token){
+    isLogged = true;
+    await loadSellerProducts();
+    await loadCart();
+    showNotification(t('welcome_back'));
+  } else {
+    showNotification(t('welcome'));
+  }
+  renderHome('');
+  updateCartBadge();
+  document.getElementById('search-row').classList.remove('hidden');
+})();
 </script>
 </body>
 </html>
